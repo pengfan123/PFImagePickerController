@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B226E8C21CEF04F700C82B39 /* PFMovieController.m in Sources */ = {isa = PBXBuildFile; fileRef = B226E8C01CEF04F700C82B39 /* PFMovieController.m */; };
+		B226E8C31CEF04F700C82B39 /* PFMovieController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B226E8C11CEF04F700C82B39 /* PFMovieController.xib */; };
 		B250D7D31CE9541400F4EC06 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B250D7D21CE9541400F4EC06 /* main.m */; };
 		B250D7D61CE9541400F4EC06 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B250D7D51CE9541400F4EC06 /* AppDelegate.m */; };
 		B250D7D91CE9541400F4EC06 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B250D7D81CE9541400F4EC06 /* ViewController.m */; };
@@ -15,6 +17,26 @@
 		B250D7E11CE9541400F4EC06 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B250D7DF1CE9541400F4EC06 /* LaunchScreen.storyboard */; };
 		B250D7EC1CE9541400F4EC06 /* PFImagePickerControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B250D7EB1CE9541400F4EC06 /* PFImagePickerControllerTests.m */; };
 		B250D7F71CE9541400F4EC06 /* PFImagePickerControllerUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = B250D7F61CE9541400F4EC06 /* PFImagePickerControllerUITests.m */; };
+		B250D8061CE9550C00F4EC06 /* PFImagePickerController.bundle in Resources */ = {isa = PBXBuildFile; fileRef = B250D8051CE9550C00F4EC06 /* PFImagePickerController.bundle */; };
+		B250D8631CE9781700F4EC06 /* PFAlbumsController.m in Sources */ = {isa = PBXBuildFile; fileRef = B250D85E1CE9781700F4EC06 /* PFAlbumsController.m */; };
+		B250D8641CE9781700F4EC06 /* PFAlbumsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B250D85F1CE9781700F4EC06 /* PFAlbumsController.xib */; };
+		B250D8651CE9781700F4EC06 /* PFImagePickerController.m in Sources */ = {isa = PBXBuildFile; fileRef = B250D8611CE9781700F4EC06 /* PFImagePickerController.m */; };
+		B250D8661CE9781700F4EC06 /* PFImagePickerController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B250D8621CE9781700F4EC06 /* PFImagePickerController.xib */; };
+		B250D86C1CE9787E00F4EC06 /* PFImagePickerTool.m in Sources */ = {isa = PBXBuildFile; fileRef = B250D86B1CE9787E00F4EC06 /* PFImagePickerTool.m */; };
+		B250D8701CE978A000F4EC06 /* AlbumsCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B250D86E1CE978A000F4EC06 /* AlbumsCell.m */; };
+		B250D8711CE978A000F4EC06 /* AlbumsCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B250D86F1CE978A000F4EC06 /* AlbumsCell.xib */; };
+		B250D8751CE9B42300F4EC06 /* PFAssetsController.m in Sources */ = {isa = PBXBuildFile; fileRef = B250D8731CE9B42300F4EC06 /* PFAssetsController.m */; };
+		B250D8761CE9B42300F4EC06 /* PFAssetsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B250D8741CE9B42300F4EC06 /* PFAssetsController.xib */; };
+		B255258F1CEBF4090058850D /* PFEditImageController.m in Sources */ = {isa = PBXBuildFile; fileRef = B255258D1CEBF4090058850D /* PFEditImageController.m */; };
+		B25525901CEBF4090058850D /* PFEditImageController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B255258E1CEBF4090058850D /* PFEditImageController.xib */; };
+		B25525931CEC0E6C0058850D /* PFDrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = B25525921CEC0E6C0058850D /* PFDrawView.m */; };
+		B2DB16191CE9BA6A0088E80A /* AssetCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B2DB16171CE9BA6A0088E80A /* AssetCell.m */; };
+		B2DB161A1CE9BA6A0088E80A /* AssetCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B2DB16181CE9BA6A0088E80A /* AssetCell.xib */; };
+		B2DB16201CE9C1D90088E80A /* ALAssetModel.m in Sources */ = {isa = PBXBuildFile; fileRef = B2DB161F1CE9C1D90088E80A /* ALAssetModel.m */; };
+		B2FB576F1D37398F00237A24 /* PFSelectView.m in Sources */ = {isa = PBXBuildFile; fileRef = B2FB576E1D37398F00237A24 /* PFSelectView.m */; };
+		B2FB57731D37416D00237A24 /* PFSelectViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B2FB57711D37416D00237A24 /* PFSelectViewCell.m */; };
+		B2FB57741D37416D00237A24 /* PFSelectViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B2FB57721D37416D00237A24 /* PFSelectViewCell.xib */; };
+		B2FB57771D37472E00237A24 /* EditALAssetModel.m in Sources */ = {isa = PBXBuildFile; fileRef = B2FB57761D37472E00237A24 /* EditALAssetModel.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +57,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B226E8BF1CEF04F700C82B39 /* PFMovieController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFMovieController.h; sourceTree = "<group>"; };
+		B226E8C01CEF04F700C82B39 /* PFMovieController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFMovieController.m; sourceTree = "<group>"; };
+		B226E8C11CEF04F700C82B39 /* PFMovieController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PFMovieController.xib; sourceTree = "<group>"; };
 		B250D7CE1CE9541400F4EC06 /* PFImagePickerController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PFImagePickerController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B250D7D21CE9541400F4EC06 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B250D7D41CE9541400F4EC06 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -51,6 +76,38 @@
 		B250D7F21CE9541400F4EC06 /* PFImagePickerControllerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PFImagePickerControllerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B250D7F61CE9541400F4EC06 /* PFImagePickerControllerUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PFImagePickerControllerUITests.m; sourceTree = "<group>"; };
 		B250D7F81CE9541400F4EC06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B250D8051CE9550C00F4EC06 /* PFImagePickerController.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = PFImagePickerController.bundle; sourceTree = "<group>"; };
+		B250D85D1CE9781700F4EC06 /* PFAlbumsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFAlbumsController.h; sourceTree = "<group>"; };
+		B250D85E1CE9781700F4EC06 /* PFAlbumsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFAlbumsController.m; sourceTree = "<group>"; };
+		B250D85F1CE9781700F4EC06 /* PFAlbumsController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PFAlbumsController.xib; sourceTree = "<group>"; };
+		B250D8601CE9781700F4EC06 /* PFImagePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFImagePickerController.h; sourceTree = "<group>"; };
+		B250D8611CE9781700F4EC06 /* PFImagePickerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFImagePickerController.m; sourceTree = "<group>"; };
+		B250D8621CE9781700F4EC06 /* PFImagePickerController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PFImagePickerController.xib; sourceTree = "<group>"; };
+		B250D86A1CE9787E00F4EC06 /* PFImagePickerTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFImagePickerTool.h; sourceTree = "<group>"; };
+		B250D86B1CE9787E00F4EC06 /* PFImagePickerTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFImagePickerTool.m; sourceTree = "<group>"; };
+		B250D86D1CE978A000F4EC06 /* AlbumsCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumsCell.h; sourceTree = "<group>"; };
+		B250D86E1CE978A000F4EC06 /* AlbumsCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlbumsCell.m; sourceTree = "<group>"; };
+		B250D86F1CE978A000F4EC06 /* AlbumsCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AlbumsCell.xib; sourceTree = "<group>"; };
+		B250D8721CE9B42300F4EC06 /* PFAssetsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFAssetsController.h; sourceTree = "<group>"; };
+		B250D8731CE9B42300F4EC06 /* PFAssetsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFAssetsController.m; sourceTree = "<group>"; };
+		B250D8741CE9B42300F4EC06 /* PFAssetsController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PFAssetsController.xib; sourceTree = "<group>"; };
+		B255258C1CEBF4090058850D /* PFEditImageController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFEditImageController.h; sourceTree = "<group>"; };
+		B255258D1CEBF4090058850D /* PFEditImageController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFEditImageController.m; sourceTree = "<group>"; };
+		B255258E1CEBF4090058850D /* PFEditImageController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PFEditImageController.xib; sourceTree = "<group>"; };
+		B25525911CEC0E6C0058850D /* PFDrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFDrawView.h; sourceTree = "<group>"; };
+		B25525921CEC0E6C0058850D /* PFDrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFDrawView.m; sourceTree = "<group>"; };
+		B2DB16161CE9BA6A0088E80A /* AssetCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AssetCell.h; sourceTree = "<group>"; };
+		B2DB16171CE9BA6A0088E80A /* AssetCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AssetCell.m; sourceTree = "<group>"; };
+		B2DB16181CE9BA6A0088E80A /* AssetCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AssetCell.xib; sourceTree = "<group>"; };
+		B2DB161E1CE9C1D90088E80A /* ALAssetModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALAssetModel.h; sourceTree = "<group>"; };
+		B2DB161F1CE9C1D90088E80A /* ALAssetModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALAssetModel.m; sourceTree = "<group>"; };
+		B2FB576D1D37398F00237A24 /* PFSelectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFSelectView.h; sourceTree = "<group>"; };
+		B2FB576E1D37398F00237A24 /* PFSelectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFSelectView.m; sourceTree = "<group>"; };
+		B2FB57701D37416D00237A24 /* PFSelectViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFSelectViewCell.h; sourceTree = "<group>"; };
+		B2FB57711D37416D00237A24 /* PFSelectViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFSelectViewCell.m; sourceTree = "<group>"; };
+		B2FB57721D37416D00237A24 /* PFSelectViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PFSelectViewCell.xib; sourceTree = "<group>"; };
+		B2FB57751D37472E00237A24 /* EditALAssetModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditALAssetModel.h; sourceTree = "<group>"; };
+		B2FB57761D37472E00237A24 /* EditALAssetModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditALAssetModel.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +158,7 @@
 		B250D7D01CE9541400F4EC06 /* PFImagePickerController */ = {
 			isa = PBXGroup;
 			children = (
+				B250D8041CE9542200F4EC06 /* PFImagePickerController */,
 				B250D7D41CE9541400F4EC06 /* AppDelegate.h */,
 				B250D7D51CE9541400F4EC06 /* AppDelegate.m */,
 				B250D7D71CE9541400F4EC06 /* ViewController.h */,
@@ -138,6 +196,80 @@
 				B250D7F81CE9541400F4EC06 /* Info.plist */,
 			);
 			path = PFImagePickerControllerUITests;
+			sourceTree = "<group>";
+		};
+		B250D8041CE9542200F4EC06 /* PFImagePickerController */ = {
+			isa = PBXGroup;
+			children = (
+				B250D8691CE9785300F4EC06 /* Tool */,
+				B250D8681CE9784B00F4EC06 /* Model */,
+				B250D8671CE9783700F4EC06 /* View */,
+				B250D85C1CE9778500F4EC06 /* Controller */,
+				B250D8051CE9550C00F4EC06 /* PFImagePickerController.bundle */,
+			);
+			path = PFImagePickerController;
+			sourceTree = "<group>";
+		};
+		B250D85C1CE9778500F4EC06 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				B250D85D1CE9781700F4EC06 /* PFAlbumsController.h */,
+				B250D85E1CE9781700F4EC06 /* PFAlbumsController.m */,
+				B250D85F1CE9781700F4EC06 /* PFAlbumsController.xib */,
+				B250D8601CE9781700F4EC06 /* PFImagePickerController.h */,
+				B250D8611CE9781700F4EC06 /* PFImagePickerController.m */,
+				B250D8621CE9781700F4EC06 /* PFImagePickerController.xib */,
+				B250D8721CE9B42300F4EC06 /* PFAssetsController.h */,
+				B250D8731CE9B42300F4EC06 /* PFAssetsController.m */,
+				B250D8741CE9B42300F4EC06 /* PFAssetsController.xib */,
+				B255258C1CEBF4090058850D /* PFEditImageController.h */,
+				B255258D1CEBF4090058850D /* PFEditImageController.m */,
+				B255258E1CEBF4090058850D /* PFEditImageController.xib */,
+				B226E8BF1CEF04F700C82B39 /* PFMovieController.h */,
+				B226E8C01CEF04F700C82B39 /* PFMovieController.m */,
+				B226E8C11CEF04F700C82B39 /* PFMovieController.xib */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		B250D8671CE9783700F4EC06 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				B250D86D1CE978A000F4EC06 /* AlbumsCell.h */,
+				B250D86E1CE978A000F4EC06 /* AlbumsCell.m */,
+				B250D86F1CE978A000F4EC06 /* AlbumsCell.xib */,
+				B2DB16161CE9BA6A0088E80A /* AssetCell.h */,
+				B2DB16171CE9BA6A0088E80A /* AssetCell.m */,
+				B2DB16181CE9BA6A0088E80A /* AssetCell.xib */,
+				B25525911CEC0E6C0058850D /* PFDrawView.h */,
+				B25525921CEC0E6C0058850D /* PFDrawView.m */,
+				B2FB576D1D37398F00237A24 /* PFSelectView.h */,
+				B2FB576E1D37398F00237A24 /* PFSelectView.m */,
+				B2FB57701D37416D00237A24 /* PFSelectViewCell.h */,
+				B2FB57711D37416D00237A24 /* PFSelectViewCell.m */,
+				B2FB57721D37416D00237A24 /* PFSelectViewCell.xib */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		B250D8681CE9784B00F4EC06 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				B2DB161E1CE9C1D90088E80A /* ALAssetModel.h */,
+				B2DB161F1CE9C1D90088E80A /* ALAssetModel.m */,
+				B2FB57751D37472E00237A24 /* EditALAssetModel.h */,
+				B2FB57761D37472E00237A24 /* EditALAssetModel.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		B250D8691CE9785300F4EC06 /* Tool */ = {
+			isa = PBXGroup;
+			children = (
+				B250D86A1CE9787E00F4EC06 /* PFImagePickerTool.h */,
+				B250D86B1CE9787E00F4EC06 /* PFImagePickerTool.m */,
+			);
+			path = Tool;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -246,8 +378,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B250D8711CE978A000F4EC06 /* AlbumsCell.xib in Resources */,
 				B250D7E11CE9541400F4EC06 /* LaunchScreen.storyboard in Resources */,
+				B2FB57741D37416D00237A24 /* PFSelectViewCell.xib in Resources */,
+				B2DB161A1CE9BA6A0088E80A /* AssetCell.xib in Resources */,
+				B25525901CEBF4090058850D /* PFEditImageController.xib in Resources */,
+				B250D8061CE9550C00F4EC06 /* PFImagePickerController.bundle in Resources */,
 				B250D7DE1CE9541400F4EC06 /* Assets.xcassets in Resources */,
+				B226E8C31CEF04F700C82B39 /* PFMovieController.xib in Resources */,
+				B250D8761CE9B42300F4EC06 /* PFAssetsController.xib in Resources */,
+				B250D8661CE9781700F4EC06 /* PFImagePickerController.xib in Resources */,
+				B250D8641CE9781700F4EC06 /* PFAlbumsController.xib in Resources */,
 				B250D7DC1CE9541400F4EC06 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -274,8 +415,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				B250D7D91CE9541400F4EC06 /* ViewController.m in Sources */,
+				B2FB57771D37472E00237A24 /* EditALAssetModel.m in Sources */,
+				B250D8701CE978A000F4EC06 /* AlbumsCell.m in Sources */,
+				B250D8631CE9781700F4EC06 /* PFAlbumsController.m in Sources */,
 				B250D7D61CE9541400F4EC06 /* AppDelegate.m in Sources */,
+				B250D8751CE9B42300F4EC06 /* PFAssetsController.m in Sources */,
+				B2FB57731D37416D00237A24 /* PFSelectViewCell.m in Sources */,
 				B250D7D31CE9541400F4EC06 /* main.m in Sources */,
+				B226E8C21CEF04F700C82B39 /* PFMovieController.m in Sources */,
+				B25525931CEC0E6C0058850D /* PFDrawView.m in Sources */,
+				B255258F1CEBF4090058850D /* PFEditImageController.m in Sources */,
+				B2DB16191CE9BA6A0088E80A /* AssetCell.m in Sources */,
+				B2FB576F1D37398F00237A24 /* PFSelectView.m in Sources */,
+				B250D8651CE9781700F4EC06 /* PFImagePickerController.m in Sources */,
+				B250D86C1CE9787E00F4EC06 /* PFImagePickerTool.m in Sources */,
+				B2DB16201CE9C1D90088E80A /* ALAssetModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -417,9 +571,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = PFImagePickerController/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = gxej.PFImagePickerController;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -428,9 +584,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = PFImagePickerController/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = gxej.PFImagePickerController;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -501,6 +659,7 @@
 				B250D7FD1CE9541400F4EC06 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B250D7FE1CE9541400F4EC06 /* Build configuration list for PBXNativeTarget "PFImagePickerControllerTests" */ = {
 			isa = XCConfigurationList;
@@ -509,6 +668,7 @@
 				B250D8001CE9541400F4EC06 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B250D8011CE9541400F4EC06 /* Build configuration list for PBXNativeTarget "PFImagePickerControllerUITests" */ = {
 			isa = XCConfigurationList;
@@ -517,6 +677,7 @@
 				B250D8031CE9541400F4EC06 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

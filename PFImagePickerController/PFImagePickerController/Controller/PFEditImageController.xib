@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PFEditImageController">
+            <connections>
+                <outlet property="backBtn" destination="hO4-gC-MbS" id="I7U-5N-5yt"/>
+                <outlet property="backImageView" destination="9nV-bS-jPF" id="obU-YG-u7V"/>
+                <outlet property="bottomBar" destination="znG-bc-FGM" id="LU8-cd-Z8M"/>
+                <outlet property="cancelButton" destination="pwS-qh-MC3" id="4nx-0E-Dzl"/>
+                <outlet property="editButton" destination="UO8-zx-Z5W" id="Rxx-36-ASW"/>
+                <outlet property="saveButton" destination="EL1-La-30Z" id="aYZ-uN-vRe"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="znG-bc-FGM">
+                    <rect key="frame" x="0.0" y="617" width="375" height="50"/>
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="9nV-bS-jPF">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="50"/>
+                        </imageView>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EL1-La-30Z">
+                            <rect key="frame" x="281" y="0.0" width="94" height="50"/>
+                            <state key="normal" image="save.png"/>
+                            <connections>
+                                <action selector="saveAct:" destination="-1" eventType="touchUpInside" id="naw-gf-MOb"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UO8-zx-Z5W">
+                            <rect key="frame" x="187" y="0.0" width="94" height="50"/>
+                            <state key="normal" image="edit.png"/>
+                            <connections>
+                                <action selector="editAct:" destination="-1" eventType="touchUpInside" id="ekq-wQ-cuw"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pwS-qh-MC3">
+                            <rect key="frame" x="93" y="0.0" width="94" height="50"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" image="cancel.png"/>
+                            <connections>
+                                <action selector="restoreAct:" destination="-1" eventType="touchUpInside" id="BlN-5H-sb1"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hO4-gC-MbS">
+                            <rect key="frame" x="0.0" y="0.0" width="93" height="50"/>
+                            <state key="normal" image="back.png"/>
+                            <connections>
+                                <action selector="backAct:" destination="-1" eventType="touchUpInside" id="464-xn-aHn"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="hO4-gC-MbS" firstAttribute="top" secondItem="znG-bc-FGM" secondAttribute="top" id="1Lg-ZV-sZH"/>
+                        <constraint firstAttribute="bottom" secondItem="UO8-zx-Z5W" secondAttribute="bottom" id="5Dt-rv-fuK"/>
+                        <constraint firstItem="EL1-La-30Z" firstAttribute="top" secondItem="znG-bc-FGM" secondAttribute="top" id="5Ky-TO-VIf"/>
+                        <constraint firstItem="UO8-zx-Z5W" firstAttribute="width" secondItem="pwS-qh-MC3" secondAttribute="width" id="7GX-PQ-Xgb"/>
+                        <constraint firstItem="UO8-zx-Z5W" firstAttribute="top" secondItem="znG-bc-FGM" secondAttribute="top" id="96Q-Ly-JkY"/>
+                        <constraint firstItem="UO8-zx-Z5W" firstAttribute="leading" secondItem="pwS-qh-MC3" secondAttribute="trailing" id="CC9-I8-UeD"/>
+                        <constraint firstAttribute="trailing" secondItem="EL1-La-30Z" secondAttribute="trailing" id="CRC-QP-Wna"/>
+                        <constraint firstItem="9nV-bS-jPF" firstAttribute="top" secondItem="znG-bc-FGM" secondAttribute="top" id="F9g-VX-8dx"/>
+                        <constraint firstAttribute="bottom" secondItem="EL1-La-30Z" secondAttribute="bottom" id="M3L-UC-bNX"/>
+                        <constraint firstItem="hO4-gC-MbS" firstAttribute="leading" secondItem="znG-bc-FGM" secondAttribute="leading" id="O67-x1-8Yo"/>
+                        <constraint firstAttribute="bottom" secondItem="9nV-bS-jPF" secondAttribute="bottom" id="Tsb-YL-Kpa"/>
+                        <constraint firstItem="EL1-La-30Z" firstAttribute="width" secondItem="znG-bc-FGM" secondAttribute="width" multiplier="1:4" id="W0a-ID-Ufq"/>
+                        <constraint firstItem="EL1-La-30Z" firstAttribute="leading" secondItem="UO8-zx-Z5W" secondAttribute="trailing" id="YmN-Ic-Tmw"/>
+                        <constraint firstAttribute="bottom" secondItem="pwS-qh-MC3" secondAttribute="bottom" id="bbg-hy-fqj"/>
+                        <constraint firstAttribute="trailing" secondItem="9nV-bS-jPF" secondAttribute="trailing" id="c0I-nW-GN6"/>
+                        <constraint firstAttribute="bottom" secondItem="hO4-gC-MbS" secondAttribute="bottom" id="fe5-ZM-Rgy"/>
+                        <constraint firstAttribute="height" constant="50" id="gTE-qT-C8Q"/>
+                        <constraint firstItem="pwS-qh-MC3" firstAttribute="leading" secondItem="hO4-gC-MbS" secondAttribute="trailing" id="hIk-uc-BFe"/>
+                        <constraint firstItem="pwS-qh-MC3" firstAttribute="top" secondItem="znG-bc-FGM" secondAttribute="top" id="otJ-Xp-0BG"/>
+                        <constraint firstItem="EL1-La-30Z" firstAttribute="width" secondItem="UO8-zx-Z5W" secondAttribute="width" id="rds-Pe-Lio"/>
+                        <constraint firstItem="9nV-bS-jPF" firstAttribute="leading" secondItem="znG-bc-FGM" secondAttribute="leading" id="wyg-mo-Vac"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="znG-bc-FGM" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="23e-Nq-wp7"/>
+                <constraint firstAttribute="bottom" secondItem="znG-bc-FGM" secondAttribute="bottom" id="haV-wA-1ge"/>
+                <constraint firstAttribute="trailing" secondItem="znG-bc-FGM" secondAttribute="trailing" id="htn-dP-GU7"/>
+            </constraints>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="back.png" width="25" height="25"/>
+        <image name="cancel.png" width="25" height="25"/>
+        <image name="edit.png" width="25" height="25"/>
+        <image name="save.png" width="25" height="25"/>
+    </resources>
+</document>

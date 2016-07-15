@@ -7,8 +7,8 @@
 //
 
 #import "ViewController.h"
-
-@interface ViewController ()
+#import "PFImagePickerController.h"
+@interface ViewController ()<PFImagePickerControllerDelegate>
 
 @end
 
@@ -18,10 +18,12 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
 }
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    PFImagePickerController *imagePicekerController = [[PFImagePickerController alloc] init];
+    imagePicekerController.delegate = self;
+    [self presentViewController:imagePicekerController animated:YES completion:nil];
 }
-
+-(void)PFImagePickerController:(PFImagePickerController *)imagePickerController didFinshSelectedWithAssets:(NSArray *)assets{
+    NSLog(@"assets------%@",assets);
+}
 @end
