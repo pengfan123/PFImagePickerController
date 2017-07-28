@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PFShowImageController">
+            <connections>
+                <outlet property="bottomBar" destination="iIj-LO-ivk" id="y1c-B9-z2v"/>
+                <outlet property="drawBtn" destination="BMI-aY-Ads" id="v1D-hU-pey"/>
+                <outlet property="editBottomBar" destination="LiV-9h-cxR" id="Bu3-yG-ZVb"/>
+                <outlet property="editSureBtn" destination="9xc-za-Q3F" id="gjx-2D-LMB"/>
+                <outlet property="editTopBar" destination="z7J-ul-Hbx" id="PPR-WU-b4c"/>
+                <outlet property="indexBtn" destination="pmE-Cz-PUR" id="oB5-l2-zBK"/>
+                <outlet property="originBtn" destination="vld-wc-4xj" id="zwp-iV-cup"/>
+                <outlet property="saveBtn" destination="7MX-T7-g1w" id="civ-i5-j9R"/>
+                <outlet property="selectBtn" destination="17R-8T-HvV" id="EkA-gO-fo5"/>
+                <outlet property="sureBtn" destination="veb-gX-XXJ" id="NcX-jS-OGC"/>
+                <outlet property="topBar" destination="af4-gu-dNY" id="Lro-UN-mHX"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" barStyle="black" translatesAutoresizingMaskIntoConstraints="NO" id="z7J-ul-Hbx" userLabel="editTopBar">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                    <items>
+                        <barButtonItem style="plain" id="84q-RU-o82">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="MLJ-Vp-nNy">
+                                <rect key="frame" x="16" y="7" width="40" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <state key="normal" title="返回"/>
+                                <connections>
+                                    <action selector="editBackAction:" destination="-1" eventType="touchUpInside" id="iN0-dx-bII"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="4xM-tP-zrx"/>
+                        <barButtonItem style="plain" id="hDJ-eT-RPh">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="7MX-T7-g1w">
+                                <rect key="frame" x="339" y="12" width="20" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" backgroundImage="save.png"/>
+                                <connections>
+                                    <action selector="saveAction:" destination="-1" eventType="touchUpInside" id="vBw-7g-V4f"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
+                    </items>
+                </toolbar>
+                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" barStyle="black" translatesAutoresizingMaskIntoConstraints="NO" id="af4-gu-dNY">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                    <items>
+                        <barButtonItem style="plain" id="JCR-YN-O39">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="ajw-RZ-e67">
+                                <rect key="frame" x="16" y="7" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <state key="normal" image="back.png"/>
+                                <connections>
+                                    <action selector="back:" destination="-1" eventType="touchUpInside" id="nFp-Is-b9F"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="Vgz-up-qoU"/>
+                        <barButtonItem style="plain" id="FXX-1j-ZzM">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="pmE-Cz-PUR">
+                                <rect key="frame" x="137" y="7" width="100" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="0/0"/>
+                            </button>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="la3-pu-v1D"/>
+                        <barButtonItem style="plain" id="A33-0B-kRk">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="17R-8T-HvV">
+                                <rect key="frame" x="329" y="7" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <state key="normal" backgroundImage="circle.png">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="selected" backgroundImage="circle_selected.png">
+                                    <color key="titleColor" red="0.15294117647058825" green="0.67843137254901964" blue="0.99215686274509807" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="selectAction:" destination="-1" eventType="touchUpInside" id="PJt-FK-2yr"/>
+                                </connections>
+                            </button>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </barButtonItem>
+                    </items>
+                </toolbar>
+                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" barStyle="black" translatesAutoresizingMaskIntoConstraints="NO" id="LiV-9h-cxR" userLabel="editBottomBar">
+                    <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <items>
+                        <barButtonItem style="plain" id="dPw-UR-weG">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="BMI-aY-Ads">
+                                <rect key="frame" x="16" y="7" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" backgroundImage="edit.png"/>
+                                <state key="selected" backgroundImage="edit_selected.png"/>
+                                <connections>
+                                    <action selector="drawAction:" destination="-1" eventType="touchUpInside" id="1xf-Fu-Kyf"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
+                        <barButtonItem width="20" style="plain" systemItem="fixedSpace" id="kHd-DG-cWE"/>
+                        <barButtonItem style="plain" id="qjK-9c-8oB">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="G59-tF-3ge">
+                                <rect key="frame" x="76" y="7" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" backgroundImage="rotate.png"/>
+                                <connections>
+                                    <action selector="clipAction:" destination="-1" eventType="touchUpInside" id="OQb-MX-1Of"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
+                        <barButtonItem width="20" style="plain" systemItem="fixedSpace" id="ntg-bV-1yh"/>
+                        <barButtonItem style="plain" id="FMf-UM-pM6">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="1qV-4n-xnW">
+                                <rect key="frame" x="136" y="7" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" image="font.png"/>
+                                <connections>
+                                    <action selector="fontAction:" destination="-1" eventType="touchUpInside" id="VbE-cS-R14"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
+                        <barButtonItem width="20" style="plain" systemItem="fixedSpace" id="K6Q-59-TDN"/>
+                        <barButtonItem style="plain" id="MaU-nI-1e0">
+                            <button key="customView" opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="4Lj-EG-U94">
+                                <rect key="frame" x="196" y="7" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" backgroundImage="filter.png"/>
+                                <connections>
+                                    <action selector="filterAction:" destination="-1" eventType="touchUpInside" id="YFY-jj-Egz"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="72a-Af-g1t"/>
+                        <barButtonItem style="plain" id="Al1-hG-UpK">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="9xc-za-Q3F">
+                                <rect key="frame" x="313" y="7" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.15294117647058825" green="0.67843137254901964" blue="0.99215686274509807" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <state key="normal" title="发送"/>
+                                <connections>
+                                    <action selector="editSureAction:" destination="-1" eventType="touchUpInside" id="OWY-d6-7bu"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
+                    </items>
+                </toolbar>
+                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" barStyle="black" translatesAutoresizingMaskIntoConstraints="NO" id="iIj-LO-ivk" userLabel="bottomBar">
+                    <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <items>
+                        <barButtonItem style="plain" id="O00-n6-aOw">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="TY3-1L-Xeb">
+                                <rect key="frame" x="16" y="7" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <state key="normal" title="编辑"/>
+                                <connections>
+                                    <action selector="editAction:" destination="-1" eventType="touchUpInside" id="KMS-Fk-hHr"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
+                        <barButtonItem width="20" style="plain" systemItem="fixedSpace" id="7Te-vd-gs2"/>
+                        <barButtonItem style="plain" id="E8R-1N-fZ3">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="vld-wc-4xj">
+                                <rect key="frame" x="92" y="7" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <state key="normal" title="原图"/>
+                                <state key="selected">
+                                    <color key="titleColor" red="0.1529411765" green="0.67843137249999996" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="originAction:" destination="-1" eventType="touchUpInside" id="ODy-w0-6Fh"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="urs-mP-WPB"/>
+                        <barButtonItem style="plain" id="EF0-1P-XT4">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="veb-gX-XXJ">
+                                <rect key="frame" x="279" y="7" width="80" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.1529411765" green="0.67843137249999996" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <state key="normal" title="确定"/>
+                                <connections>
+                                    <action selector="sureAction:" destination="-1" eventType="touchUpInside" id="yFP-xg-rzJ"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
+                    </items>
+                </toolbar>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="-66" y="-204"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="back.png" width="30" height="30"/>
+        <image name="circle.png" width="128" height="128"/>
+        <image name="circle_selected.png" width="128" height="128"/>
+        <image name="edit.png" width="30" height="30"/>
+        <image name="edit_selected.png" width="30" height="30"/>
+        <image name="filter.png" width="90" height="90"/>
+        <image name="font.png" width="30" height="30"/>
+        <image name="rotate.png" width="200" height="200"/>
+        <image name="save.png" width="30" height="30"/>
+    </resources>
+</document>

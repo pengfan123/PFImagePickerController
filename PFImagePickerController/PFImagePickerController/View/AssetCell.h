@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-@class ALAssetModel;
+@class AssetModel;
 @class AssetCell;
 @protocol AssetCellDelegate <NSObject>
 @optional
@@ -17,7 +17,7 @@
  *  @param cell      cell对象
  *  @param dataModel 数据模型
  */
--(void)AssetCell:(AssetCell *)cell didClickWithDataModel:(ALAssetModel *)dataModel;
+-(void)AssetCell:(AssetCell *)cell didClickWithDataModel:(AssetModel *)dataModel andOriginalImagePath:(NSString *) imagePath andIndex:(NSInteger)index;
 /**
  *  交给controller去判断是否能被选定
  *
@@ -27,8 +27,8 @@
  *
  *  @return 返回的是一个BOOL值 指示这个按钮是否可以被选定
  */
--(BOOL)AssetCell:(AssetCell *)cell didSelectWithDataModel:(ALAssetModel *)dataModel andButton:(UIButton *)selectBtn;
+-(BOOL)AssetCell:(AssetCell *)cell didSelectWithDataModel:(AssetModel *)dataModel andButton:(UIButton *)selectBtn;
 @end
 @interface AssetCell : UICollectionViewCell
--(instancetype)initWithCollectionView:(UICollectionView *)collectionView andDataModel:(ALAssetModel *)dataModel andIndexPath:(NSIndexPath *)indexPath andDelegate:(id<AssetCellDelegate>)delegate;
+-(instancetype)initWithCollectionView:(UICollectionView *)collectionView andDataModel:(AssetModel *)dataModel andIndexPath:(NSIndexPath *)indexPath andDelegate:(id<AssetCellDelegate>)delegate;
 @end

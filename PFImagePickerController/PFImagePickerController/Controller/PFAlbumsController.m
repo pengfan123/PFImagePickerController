@@ -15,7 +15,7 @@
 @interface PFAlbumsController ()<UITableViewDataSource,UITableViewDelegate,AlbumsCellDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *albumsTable;
 @property(nonatomic,strong)NSArray *dataArr;
-@property(nonatomic,strong)ALAssetsLibrary *library;
+@property(nonatomic,strong)PHPhotoLibrary *library;
 @end
 
 @implementation PFAlbumsController
@@ -34,13 +34,14 @@
     [self updateGroups];
 }
 -(void)dealloc{
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:ALAssetsChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:PhotosChangeNotification object:nil];
 }
 -(void)viewWillAppear:(BOOL)animated{
     self.navigationItem.rightBarButtonItem.enabled = [PFImagePickerTool checkSelectionStatus];
 }
 #pragma mark - private method
 -(void)setupUI{
+    self.editing = NO;
     self.title = @"相册";
     UIBarButtonItem *leftItem = [[UIBarButtonItem alloc] initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(cancelAction:)];
     self.navigationItem.leftBarButtonItem = leftItem;
@@ -49,10 +50,10 @@
 }
 -(void)registeObserver{
     //regist the observer for observing the change of photo library
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(albumsChangeNotification:) name:ALAssetsChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(albumsChangeNotification:) name:PhotosChangeNotification object:nil];
 }
 -(void)updateGroups{
-    [PFImagePickerTool fetchGroupsWithCompletion:^(NSError *error, NSArray *dataArr) {
+    [PFImagePickerTool fetchCollectionsWithCompletion:^(NSError *error, NSArray *dataArr) {
         self.dataArr = dataArr;
         [_albumsTable reloadData];
     }];
@@ -89,17 +90,17 @@
     return 0.00001f;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    ALAssetsGroup *group = nil;
+    PHAssetCollection *collection = nil;
     if (indexPath.row < self.dataArr.count) {
-        group = self.dataArr[indexPath.row];
+        collection = self.dataArr[indexPath.row];
     }
-    AlbumsCell *cell = [[AlbumsCell alloc] initWithTableView:tableView andAssetsGroup:group andDelegate:self];
+    AlbumsCell *cell = [[AlbumsCell alloc] initWithTableView:tableView andAssetsCollection:collection andDelegate:self];
     return cell;
 }
 #pragma mark - AlbumsCellDelegate
--(void)AlbumsCell:(AlbumsCell *)cell didSelectOneGroup:(ALAssetsGroup *)group{
+-(void)AlbumsCell:(AlbumsCell *)cell didSelectOneCollection:(PHAssetCollection *)collection{
     PFAssetsController *controller = [[PFAssetsController alloc] init];
-    controller.group = group;
+    controller.collection = collection;
     controller.imagePickerController = self.imagePickerController;
     [self.navigationController pushViewController:controller animated:YES];
 }

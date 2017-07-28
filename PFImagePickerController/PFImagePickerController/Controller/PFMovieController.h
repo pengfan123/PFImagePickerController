@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-@class ALAsset;
+@class PHAsset;
 @interface PFMovieController : UIViewController
-@property(nonatomic,strong)ALAsset *asset;
+@property(nonatomic,strong)PHAsset *asset;
 @end

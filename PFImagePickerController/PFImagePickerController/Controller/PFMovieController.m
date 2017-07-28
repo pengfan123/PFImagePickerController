@@ -7,7 +7,7 @@
 //
 
 #import "PFMovieController.h"
-#import <AssetsLibrary/AssetsLibrary.h>
+#import <Photos/Photos.h>
 @interface PFMovieController ()<UIWebViewDelegate>
 @property (weak, nonatomic) IBOutlet UIWebView *movieView;
 @end
@@ -19,11 +19,23 @@
 }
 #pragma mark - private method
 -(void)loadRequest{
-    NSURLRequest *request = [NSURLRequest requestWithURL:self.asset.defaultRepresentation.url];
-    [_movieView loadRequest:request];
+    PHVideoRequestOptions *options2 = [[PHVideoRequestOptions alloc] init];
+    options2.deliveryMode=PHVideoRequestOptionsDeliveryModeAutomatic;
+    [[PHImageManager defaultManager] requestAVAssetForVideo:_asset options:options2 resultHandler:^(AVAsset*_Nullable asset,
+                                                                                                    AVAudioMix*_Nullable audioMix,NSDictionary*_Nullable info) {
+        
+        if ([asset isKindOfClass:[AVURLAsset class]]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+               [_movieView loadRequest:[NSURLRequest requestWithURL:((AVURLAsset *)asset).URL]];
+            });
+        }
+    }];
 }
 #pragma mark - UIWebViewDelegate
 -(void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error{
     NSLog(@"error--------%@",error.localizedDescription);
+}
+-(void)dealloc{
+    [_movieView stopLoading];
 }
 @end

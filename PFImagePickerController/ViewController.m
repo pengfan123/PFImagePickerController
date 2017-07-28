@@ -8,7 +8,9 @@
 
 #import "ViewController.h"
 #import "PFImagePickerController.h"
+#import "PFImagePickerTool.h"
 @interface ViewController ()<PFImagePickerControllerDelegate>
+@property (weak, nonatomic) IBOutlet UIImageView *poster;
 
 @end
 
@@ -24,6 +26,13 @@
     [self presentViewController:imagePicekerController animated:YES completion:nil];
 }
 -(void)PFImagePickerController:(PFImagePickerController *)imagePickerController didFinshSelectedWithAssets:(NSArray *)assets{
-    NSLog(@"assets------%@",assets);
+    [PFImagePickerTool enumToGetImage:assets andHandler:^(BOOL *stop, NSUInteger index, UIImage *result, NSString *UTI) {
+         NSLog(@"index-----%lu",index);
+    }];
+}
+-(void)PFImagePickerControllerDidClip:(PFImagePickerController *)imagePickerController andResultImage:(UIImage *)result {
+    _poster.image = result;
+    NSLog(@"result-----");
+    
 }
 @end

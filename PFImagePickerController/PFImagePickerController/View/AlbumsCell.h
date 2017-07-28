@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-@class ALAssetsGroup;
+@class PHAssetCollection;
 @class AlbumsCell;
 @protocol AlbumsCellDelegate <NSObject>
 @optional
@@ -17,7 +17,7 @@
  *  @param cell  点击的Cell
  *  @param group 当前cell持有的ALAssetsGroup对象
  */
--(void)AlbumsCell:(AlbumsCell *)cell didSelectOneGroup:(ALAssetsGroup *)group;
+-(void)AlbumsCell:(AlbumsCell *)cell didSelectOneCollection:(PHAssetCollection *)collection;
 @end
 @interface AlbumsCell : UITableViewCell
 /**代理*/
@@ -26,10 +26,10 @@
  *  初始化方法
  *
  *  @param tableView 用于重用
- *  @param group     ALAssetsGroup对象,获取当前相册下的一些信息
+ *  @param collection     PHAssetCollection对象,获取当前相册下的一些信息
  *  @param delegate  代理
  *
  *  @return 返回一个AlbumsCell对象
  */
--(instancetype)initWithTableView:(UITableView *)tableView andAssetsGroup:(ALAssetsGroup *)group andDelegate:(id<AlbumsCellDelegate>)delegate;
+-(instancetype)initWithTableView:(UITableView *)tableView andAssetsCollection:(PHAssetCollection *)collection andDelegate:(id<AlbumsCellDelegate>)delegate;
 @end

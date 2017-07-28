@@ -31,12 +31,21 @@
  */
 -(void)PFImagePickerControllerDidCancel:(PFImagePickerController *)imagePickerController;
 
+/**
+ *  裁剪获得的图片
+ *
+ *  @param imagePickerController PFImagePickerController对象
+ */
+-(void)PFImagePickerControllerDidClip:(PFImagePickerController *)imagePickerController andResultImage:(UIImage *)result;
+
+
 
 @end
 @interface PFImagePickerController : UIViewController
 @property(nonatomic,weak)id<PFImagePickerControllerDelegate>delegate;
 //完成多选
--(void)pfImagePickerControllerDidFinishPickImage;
+- (void)pfImagePickerControllerDidFinishPickImage ;
 //取消多选
--(void)pfImagePickerControllerDidCancelPickImage;
+- (void)pfImagePickerControllerDidCancelPickImage;
+- (void)pfImagePickerControllerDidClipImage:(UIImage *)result;
 @end

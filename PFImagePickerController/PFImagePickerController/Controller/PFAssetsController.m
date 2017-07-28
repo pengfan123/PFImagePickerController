@@ -8,11 +8,11 @@
 
 #import "PFAssetsController.h"
 #import "PFImagePickerController.h"
-#import "PFEditImageController.h"
 #import "PFMovieController.h"
+#import "PFShowImageController.h"
 #import "PFImagePickerTool.h"
 #import "AssetCell.h"
-#import "ALAssetModel.h"
+#import "AssetModel.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 static NSString * const identifier = @"AssetCell";
 @interface PFAssetsController ()<UICollectionViewDataSource,UICollectionViewDelegate,AssetCellDelegate>
@@ -37,13 +37,16 @@ static NSString * const identifier = @"AssetCell";
     [self updateButtonStatus];
 }
 -(void)dealloc{
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:ALAssetsChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:PhotosChangeNotification object:nil];
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.assetsView reloadData];
 }
 #pragma mark - private method
 -(void)setupUI{
     //set Title
-    self.title = [self.group valueForProperty:ALAssetsGroupPropertyName];
-    self.automaticallyAdjustsScrollViewInsets = NO;
+    self.title = self.collection.localizedTitle;
     
     //add collectionView
     CGFloat width = [UIScreen mainScreen].bounds.size.width / 3.0;
@@ -56,7 +59,7 @@ static NSString * const identifier = @"AssetCell";
     flowLayout.headerReferenceSize = CGSizeZero;
     
     UICollectionView *assetsView = [[UICollectionView alloc] initWithFrame:[UIScreen mainScreen].bounds collectionViewLayout:flowLayout];
-    assetsView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+    assetsView.alwaysBounceVertical = YES;
     assetsView.backgroundColor = [UIColor whiteColor];
     assetsView.delegate   = self;
     assetsView.dataSource = self;
@@ -73,7 +76,7 @@ static NSString * const identifier = @"AssetCell";
     [self.imagePickerController pfImagePickerControllerDidFinishPickImage];
 }
 -(void)registObserver{
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(assetsChangeNotification:) name:ALAssetsChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(assetsChangeNotification:) name:PhotosChangeNotification object:nil];
 }
 -(void)assetsChangeNotification:(NSNotification *)info{
     //延时更新,避免刷新失败
@@ -85,20 +88,16 @@ static NSString * const identifier = @"AssetCell";
     self.navigationItem.rightBarButtonItem.enabled = [PFImagePickerTool checkSelectionStatus];
 }
 -(void)reloadData{
-    [PFImagePickerTool reloadAssetsWithAlbumsGroup:_group andCompletion:^(NSError *error, NSArray *dataArr) {
-        if (error) {
-        }else{
-            //update UI
+    [PFImagePickerTool reloadAssetsWithCollection:_collection andCompletion:^(NSError *error, NSArray *dataArr) {
+        if (!error) {
             self.dataArr = dataArr;
             [_assetsView reloadData];
         }
     }];
 }
 -(void)loadData{
-    [PFImagePickerTool fetchAssetsWithAlbumsGroup:_group andCompletion:^(NSError *error, NSArray *dataArr) {
-        if (error) {
-        }else{
-            //update UI
+    [PFImagePickerTool fetchAssetsWithAssetCollection:_collection andCompletion:^(NSError *error, NSArray *dataArr) {
+        if (!error) {
             self.dataArr = dataArr;
             [_assetsView reloadData];
         }
@@ -112,7 +111,7 @@ static NSString * const identifier = @"AssetCell";
     return self.dataArr.count;
 }
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
-    ALAssetModel *model = nil;
+    AssetModel *model = nil;
     if (indexPath.item < self.dataArr.count) {        
         model = self.dataArr[indexPath.row];
     }
@@ -121,25 +120,18 @@ static NSString * const identifier = @"AssetCell";
 }
 #pragma mark - AssetCellDelegate
 //点击选择按钮
--(BOOL)AssetCell:(AssetCell *)cell didSelectWithDataModel:(ALAssetModel *)dataModel andButton:(UIButton *)selectBtn{
+-(BOOL)AssetCell:(AssetCell *)cell didSelectWithDataModel:(AssetModel *)dataModel andButton:(UIButton *)selectBtn{
     dataModel.isSelected = !dataModel.isSelected;
     dataModel.isSelected = [PFImagePickerTool storeSelectedOrUnselectedModel:dataModel];
     [self updateButtonStatus];
     return dataModel.isSelected;
-    
 }
 //点击item,预留的,跳入编辑界面
--(void)AssetCell:(AssetCell *)cell didClickWithDataModel:(ALAssetModel *)dataModel{
-    if (dataModel.type == PictureStyle) {
-        PFEditImageController *editController = [[PFEditImageController alloc] init];
-        editController.asset = dataModel.asset;
-        editController.group = self.group;
-        [self.navigationController pushViewController:editController animated:YES];
-    }else{
-        PFMovieController *movieController = [[PFMovieController alloc] init];
-        movieController.asset = dataModel.asset;
-        [self.navigationController pushViewController:movieController animated:YES];
-    }
-    
+-(void)AssetCell:(AssetCell *)cell didClickWithDataModel:(AssetModel *)dataModel andOriginalImagePath:(NSString *)imagePath andIndex:(NSInteger)index{
+    PFShowImageController *showVC = [[PFShowImageController alloc] init];
+    showVC.imagePickerController  = _imagePickerController;
+    showVC.datas = _dataArr;
+    showVC.currentIndex = index;
+    [self.navigationController pushViewController:showVC animated:true];
 }
 @end

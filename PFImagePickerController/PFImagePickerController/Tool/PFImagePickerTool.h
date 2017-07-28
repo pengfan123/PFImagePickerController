@@ -8,54 +8,51 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-@class ALAssetModel;
-@class ALAssetsGroup;
-typedef enum{
-    PFImagePickerTypeNone = 0,  //include photos and videos
-    PFImagePickerTypePhotos,    //photos
-    PFImagePickerTypeVideos     //videos
-}mediaType;
+#import <Photos/Photos.h>
+
+@class PHAsset, PHAssetCollection, AssetModel;
 typedef void(^enumrationBlock)(NSError *error,NSArray *dataArr);
-@interface PFImagePickerTool : NSObject<NSCopying>
-/**
- *  判断当前是否可用
- *
- *  @return 返回一个BOOL值(表明当前图库是否可用)
- */
-+(BOOL)isAccessible;
+typedef void(^operationBlock)();
+@interface PFImagePickerTool : NSObject<NSCopying,PHPhotoLibraryChangeObserver>
 /**
  *  遍历获取所有资源
  *
  *  @param finish 完成时调用的block
  * 
  */
-+(void)fetchGroupsWithCompletion:(enumrationBlock)finish;
++ (void)fetchCollectionsWithCompletion:(enumrationBlock)finish;
 /**
- *  设置筛选的条件,是只展示图片还是视频或者是两者都有
- *  discussion: default is PFImagePickerTypePhotos
+ *  设置筛选的条件
+ *  discussion: default is PHAssetMediaTypeImage
  *
  *  @param type 类型
  */
-+(void)setFilterType:(mediaType)type;
++ (void)setFilterType:(PHAssetMediaType)type;
 /**
  *  获取对应group下的assets
  *
- *  @param group ALAssetsGroup对象
+ *  @param collection PHAssetCollection对象
  */
-+(void)fetchAssetsWithAlbumsGroup:(ALAssetsGroup *)group andCompletion:(enumrationBlock)finish;
++(void)fetchAssetsWithAssetCollection:(PHAssetCollection *)collection andCompletion:(enumrationBlock)finish ;
 /**
  *  针对于刷新数据的,可能图库资源发生改变,这时候要及时刷新展示的数据
  *
- *  @param group  所属的alassetsGroup
+ *  @param collection  所属的PHAssetCollection
  *  @param finish 结束时调用的block
  */
-+(void)reloadAssetsWithAlbumsGroup:(ALAssetsGroup *)group andCompletion:(enumrationBlock)finish;
++ (void)reloadAssetsWithCollection:(PHAssetCollection *)collection andCompletion:(enumrationBlock)finish;
 /**
  *  操作模型(删除非选的,添加选择的)
  *
  *  @param model 模型
  */
-+(BOOL)storeSelectedOrUnselectedModel:(ALAssetModel *)model;
++ (BOOL)storeSelectedOrUnselectedModel:(AssetModel *)model;
+/**
+ *  返回当前选择的数量
+ *
+*/
+
++ (NSInteger)selectedCount;
 /**
  *  设置最多选择的图片的数量
  *
@@ -77,7 +74,7 @@ typedef void(^enumrationBlock)(NSError *error,NSArray *dataArr);
 /**
  *  清除缓存数据
  */
-+(void)clearAction;
++ (void)restoreAction;
 /**
  *  判断是否能选定
  *
@@ -103,13 +100,48 @@ typedef void(^enumrationBlock)(NSError *error,NSArray *dataArr);
  *
  *  @return UIImage对象
  */
-+(UIImage *)loadImageWithName:(NSString *)imageName;
++ (UIImage *)loadImageWithName:(NSString *)imageName;
+
 /**
  *  保留编辑的View
  *
  *  @param view
  *
  */
-+(void)captureImageWithView:(UIView *)view andWriteToGroup:(ALAssetsGroup *)group withFinishBlock:(void(^)(NSError *error))completion;
-extern  NSString * const ALAssetsChangeNotification;
++ (void)captureImage:(UIImage *)image handler:(void (^)(BOOL result))completion;
+/**
+ *  保留编辑的View
+ *
+ *  @param view
+ *
+ */
++ (void)captureImageWithView:(UIView *)view andWriteToCollection:(PHAssetCollection *)collection withFinishBlock:(void (^)(NSError *, BOOL))completion;
+
+/**
+ *  保留编辑的View(保存到以你自己app名字命名的相册中)
+ *
+ *  @param view
+ *
+ */
++ (void)captureImageWithView:(UIView *)view withFinishBlock:(void (^)(BOOL success, UIImage *result))completion;
+
+//获取相册中的资源的数量
++ (void)requestCountOfAssetsInCollection:(PHAssetCollection *)collection completionHandler:(void(^)(NSUInteger count, BOOL result))completion;
+
+//获取准确尺寸的图片(会根据尺寸来裁剪)
++ (void)requestImageWithAsset:(PHAsset *)asset targetSize:(CGSize)size completionHandler:(void(^)(UIImage *image, NSString *filePath, BOOL succees))handler;
+
+//快速获取图片
++ (void)requestFastImageWithAsset:(PHAsset *)asset Handler:(void(^)(UIImage *image, NSString *UTI, BOOL succees))handler;
+
+//根据Asset取得图片(原图)
++ (void)requestImageWithAsset:(PHAsset *)asset completionHandler:(void(^)(UIImage *image, NSString *filePath, BOOL succees))handler;
+
+//根据collection获取相册的封面
++ (void)requestPosterForAssetsCollection:(PHAssetCollection *)collection completionHandler:(void(^)(UIImage *result, NSString *filePath, BOOL succees))completion;
++ (void)addOperation:(operationBlock) operation;
+
++ (void)enumToGetImage:(NSArray <AssetModel *> *)models andHandler:(void(^)(BOOL *stop, NSUInteger index, UIImage *result, NSString *UTI))completion;
+extern  NSString *  const PhotosChangeNotification;
+extern  NSString *  const PhotosDidEndSelectNotification;
 @end

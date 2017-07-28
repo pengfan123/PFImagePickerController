@@ -30,25 +30,34 @@
     [self.view addSubview:navi.view];
     [navi didMoveToParentViewController:self];
 }
+- (BOOL)prefersStatusBarHidden {
+    return YES;
+}
 #pragma mark - extern method
 //介绍选择
 -(void)pfImagePickerControllerDidFinishPickImage{
     [self dismissViewControllerAnimated:YES completion:^{
         if ([self.delegate respondsToSelector:@selector(PFImagePickerController:didFinshSelectedWithAssets:)]) {
-            NSArray *dataArr = [PFImagePickerTool getSelectedAssetsArr];
-            [self.delegate PFImagePickerController:self didFinshSelectedWithAssets:dataArr];
-            [PFImagePickerTool clearAction];
+            [self.delegate PFImagePickerController:self didFinshSelectedWithAssets:[PFImagePickerTool getSelectedAssetsArr]];
+            [PFImagePickerTool restoreAction];
         }
     }];
 }
 //取消选择
 -(void)pfImagePickerControllerDidCancelPickImage{
     [self dismissViewControllerAnimated:YES completion:^{
-        [PFImagePickerTool clearAction];
+        [PFImagePickerTool restoreAction];
         if ([self.delegate respondsToSelector:@selector(PFImagePickerControllerDidCancel:)]) {
             [self.delegate PFImagePickerControllerDidCancel:self];
         }
         
+    }];
+}
+- (void)pfImagePickerControllerDidClipImage:(UIImage *)result {
+    [self dismissViewControllerAnimated:YES completion:^{
+        if ([self.delegate respondsToSelector:@selector(PFImagePickerControllerDidClip:andResultImage:)]) {
+            [self.delegate PFImagePickerControllerDidClip:self andResultImage:result];
+        }
     }];
 }
 @end

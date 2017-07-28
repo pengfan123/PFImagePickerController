@@ -7,19 +7,27 @@
 //
 
 #import "PFImagePickerTool.h"
-#import "ALAssetModel.h"
-#import <AssetsLibrary/AssetsLibrary.h>
-NSString * const ALAssetsChangeNotification = @"PFImagePickerToolUpdate";
+#import "AssetModel.h"
+#import <CommonCrypto/CommonDigest.h>
+#define CACHE_PATH  @"PFImagePickeController"
+NSString * const PhotosChangeNotification = @"PFImagePickerToolUpdate";
+
 @interface PFImagePickerTool()
 //过滤的条件(图片,视频或者两者都包含)
-@property(nonatomic,assign)mediaType filter;
+@property(nonatomic,assign)PHAssetMediaType filter;
 @property(nonatomic,assign)NSUInteger minumCount;
 @property(nonatomic,assign)NSUInteger maxCount;
+@property(nonatomic,strong)NSArray *collections;
 @end
-static NSMutableDictionary *selectedDic;      //用于存放选定的模型
+static int MAX = 20;
+static NSMutableDictionary *selectedDic; //用于存放选定的模型
+static NSMutableDictionary *imageDic;    //缓存加载的图片
 static NSMutableDictionary *cacheDic;    //用于缓存模型
-static ALAssetsLibrary *library;         //library对象
+static PHPhotoLibrary *library;          //library对象
 static PFImagePickerTool *shareTool;     //单例对象
+static PHAssetCollection *yourCollection;//以你app名字命名的collection
+static NSString *bundleName;
+static NSMutableArray *tasks;
 @implementation PFImagePickerTool
 #pragma mark - singleton
 +(instancetype)sharedTool{
@@ -44,23 +52,64 @@ static PFImagePickerTool *shareTool;     //单例对象
 #pragma mark - initialize
 +(void)initialize
 {
-    //initialize the dictionary
-    selectedDic = [NSMutableDictionary new];
-    cacheDic    = [NSMutableDictionary new];
-    library     = [[ALAssetsLibrary alloc] init];
-    shareTool   = [[self alloc] init];
-    shareTool.filter = PFImagePickerTypePhotos;
+    [super initialize];
+    //initialization
+    selectedDic  = [NSMutableDictionary new];
+    cacheDic     = [NSMutableDictionary new];
+    imageDic     = [NSMutableDictionary new];
+    tasks        = [NSMutableArray new];
+    library      = [PHPhotoLibrary sharedPhotoLibrary];
+    shareTool    = [[self alloc] init];
+    bundleName = [[NSBundle mainBundle] objectForInfoDictionaryKey:(__bridge NSString*)kCFBundleNameKey];
+    shareTool.filter = PHAssetMediaTypeUnknown;
     shareTool.minumCount = 0;
     shareTool.maxCount   = 10;
     //regist observer
-    [[NSNotificationCenter defaultCenter] addObserver:shareTool selector:@selector(alassetsLibraryChangeNotification:) name:ALAssetsLibraryChangedNotification object:nil];
+    [library registerChangeObserver:shareTool];
+    //check authorization
+    if ([PHPhotoLibrary authorizationStatus] != PHAuthorizationStatusAuthorized)
+    {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+            if ( status == PHAuthorizationStatusAuthorized)
+            {
+                NSLog(@"成功授权!");
+            }
+            
+        }];
+    }
+    [shareTool addObserver];
     
 }
-#pragma mark - static method
-+(BOOL)isAccessible
-{
-   return [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]&&[UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum];
++ (void)addOperation:(operationBlock)operation {
+    [shareTool addOperation:operation];
 }
+- (void)addOperation:(operationBlock) operation {
+    [tasks addObject:operation];
+    if (tasks.count > MAX) {
+        [tasks removeObject:tasks.firstObject];
+    }
+}
+- (void)addObserver {
+        CFRunLoopRef runloopRef = CFRunLoopGetCurrent();
+        CFRunLoopObserverContext context = {
+            0,
+            (__bridge void *)shareTool,
+            &CFRetain,
+            &CFRelease,
+            NULL
+        };
+        CFRunLoopObserverRef observerRef = CFRunLoopObserverCreate(NULL, kCFRunLoopBeforeWaiting, YES, 0, &callBack, &context);
+        CFRunLoopAddObserver(runloopRef, observerRef, kCFRunLoopCommonModes);
+        CFRelease(observerRef);
+}
+void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
+   operationBlock task = tasks.firstObject;
+    if (task) {
+        task();
+        [tasks removeObject:task];
+    }
+}
+#pragma mark - static method
 +(UIColor *)shadowColor
 {
     NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"PFImagePickerController" ofType:@"bundle"];
@@ -68,56 +117,121 @@ static PFImagePickerTool *shareTool;     //单例对象
     NSString *imagePath = [bundle pathForResource:@"shadow" ofType:@"png"];
     return [UIColor colorWithPatternImage:[UIImage imageWithContentsOfFile:imagePath]];
 }
-+(void)setFilterType:(mediaType)type
-{
-    PFImagePickerTool *tool = [self sharedTool];
-    tool.filter = type;
++ (void)setFilterType:(PHAssetMediaType)type {
+    shareTool.filter = type;
 }
 +(void)setMaxCount:(NSUInteger)maxCount
 {
-    PFImagePickerTool *tool = [self sharedTool];
-    tool.maxCount = maxCount;
+    shareTool.maxCount = maxCount;
 }
 +(void)setMinumCount:(NSUInteger)minumCount
 {
-    PFImagePickerTool *tool = [self sharedTool];
-    tool.minumCount = minumCount;
+   shareTool.minumCount = minumCount;
 }
 +(BOOL)checkSelectionStatus
 {
     BOOL status = NO;
-    PFImagePickerTool *tool = [self sharedTool];
     NSUInteger count = [selectedDic allValues].count;
-    if (count >= tool.minumCount && count <= tool.maxCount) {
+    if (count >= shareTool.minumCount && count <= shareTool.maxCount) {
         status = YES;
     }
     return status;
 }
-+(void)fetchGroupsWithCompletion:(enumrationBlock)finish
+
++ (void)excuteOperation:(void(^)())operation onQueue:(dispatch_queue_t)queue {
+    if (queue == NULL) {
+        return;
+    }
+    __block void(^handler)() = [operation copy];
+    dispatch_async(queue, ^{
+        handler();
+        handler = nil;
+    });
+}
++ (void)excuteOnMainThreadWithOperation:(void(^)())operation {
+    [self excuteOperation:operation onQueue:dispatch_get_main_queue()];
+}
+
++ (void)excuteOnGlobalThreadWithOperation:(void(^)())operation {
+    [self excuteOperation:operation onQueue:dispatch_get_main_queue()];
+}
++ (void)requestAppCollectionWithHandler:(void(^)(PHAssetCollection *, bool))completion{
+    __block void(^handler)(PHAssetCollection *, bool) = [completion copy];
+    if (yourCollection != nil) {
+        handler(yourCollection,YES);
+        handler = nil;
+        return;
+    }
+    else {
+            [shareTool.collections enumerateObjectsUsingBlock:^(PHAssetCollection *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                if ([obj.localizedTitle isEqualToString:bundleName]) {
+                    
+                    yourCollection = obj;
+                    [self excuteOnMainThreadWithOperation:^{
+                        if (handler) {
+                            handler(yourCollection,YES);
+                            handler = nil;
+                        }
+                    }];
+                    return ;
+                    *stop = YES;
+                }
+             }];
+            //遍历完,如果没有就创建一个
+            NSError *error = nil;
+            __block NSString *identifier = nil;
+            [library performChangesAndWait:^{
+                PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:bundleName];
+                identifier = request.placeholderForCreatedAssetCollection.localIdentifier;
+            } error:&error];
+            
+            //返回处理结果
+                if (error == nil && identifier != nil) {
+                    PHFetchResult *result = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[identifier] options:nil];
+                    yourCollection = result.firstObject;
+                    if (handler) {
+                        handler(yourCollection,YES);
+                        handler = nil;
+                    }
+                    
+                } else {
+                    if (handler) {
+                        handler(nil,NO);
+                        handler = nil;
+                    }
+                }
+    }
+}
++(void)fetchCollectionsWithCompletion:(enumrationBlock)finish
 {
-    [[self sharedTool] fetchGroupsWithCompletion:finish];
+    [shareTool fetchCollectionWithCompletion:finish];
 }
-+(void)fetchAssetsWithAlbumsGroup:(ALAssetsGroup *)group andCompletion:(enumrationBlock)finish{
-    [[self sharedTool] fetchAssetsWithAlbumsGroup:group andCompletion:finish];
+
++(void)fetchAssetsWithAssetCollection:(PHAssetCollection *)collection andCompletion:(enumrationBlock)finish {
+    [shareTool fetchAssetsWithAssetCollection:collection andCompletion:finish withCache:YES];
 }
-+(void)reloadAssetsWithAlbumsGroup:(ALAssetsGroup *)group andCompletion:(enumrationBlock)finish{
-    [[self sharedTool] reloadAssetsWithAlbumsGroup:group andCompletion:finish];
+
+//reload assets for specify collection (this method will be called when photo library has been changed(eg. photos has been edited,deleted...))
++ (void)reloadAssetsWithCollection:(PHAssetCollection *)collection andCompletion:(enumrationBlock)finish {
+    [shareTool reloadAssetsWithCollection:collection andCompletion:finish];
 }
-+(BOOL)storeSelectedOrUnselectedModel:(ALAssetModel *)model
+
++ (BOOL)storeSelectedOrUnselectedModel:(AssetModel *)model
 {
     if (!model) {
         return NO;
     }
     if (model.isSelected) {
-        [selectedDic setObject:model forKey:model.asset.defaultRepresentation.url.absoluteString];
+        NSString *key = model.asset.localIdentifier;
+        [selectedDic setObject:model forKey:key];
         if (![self canSelect]) {
-            [selectedDic removeObjectForKey:model.asset.defaultRepresentation.url.absoluteString];
+            [selectedDic removeObjectForKey:key];
             model.isSelected = NO;
             return NO;
         }
         return YES;
     }else{
-        [selectedDic removeObjectForKey:model.asset.defaultRepresentation.url.absoluteString];
+        [selectedDic removeObjectForKey:model.asset.localIdentifier];
         return NO;
     }
    
@@ -130,252 +244,503 @@ static PFImagePickerTool *shareTool;     //单例对象
         return YES;
     }
 }
-+(NSArray *)getSelectedAssetsArr
-{
-    NSMutableArray *dataArr = [NSMutableArray new];
-    NSArray *arr = [selectedDic allValues];
-    for (ALAssetModel *oneModel in arr) {
-        [dataArr addObject:oneModel.asset];
-    }
-    return [NSArray arrayWithArray:dataArr];
++ (NSInteger)selectedCount {
+    return selectedDic.count;
 }
-+(void)clearAction{
++ (NSArray *)getSelectedAssetsArr {
+    return [selectedDic allValues];
+}
+
++ (void)restoreAction {
     [selectedDic removeAllObjects];
     [cacheDic removeAllObjects];
     shareTool.minumCount = 0;
     shareTool.maxCount   = 10;
-    shareTool.filter = PFImagePickerTypePhotos;
+    shareTool.filter = PHAssetMediaTypeUnknown;
 }
-+(UIImage *)loadImageWithName:(NSString *)imageName
-{
+
++ (UIImage *)loadImageWithName:(NSString *)imageName {
     if (!imageName) {
         return nil;
     }
-    
-    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"PFImagePickerController" ofType:@"bundle"];
-    NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
-    NSString *imagePath = [bundle pathForResource:imageName ofType:@"png"];
-    UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
+    UIImage *image = [UIImage imageNamed:imageName];
     return image;
 }
-#pragma mark -  dynamic method
--(void)fetchGroupsWithCompletion:(enumrationBlock)finish
-{
-    enumrationBlock completion = [finish copy];
-    __block NSMutableArray *dataArr = [NSMutableArray new];
-    
-    [library enumerateGroupsWithTypes:ALAssetsGroupAll|ALAssetsGroupLibrary usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
-        if (group) {
-            [dataArr addObject:group];
-        }else{
-            if (completion) {
-                NSArray *array = [NSArray arrayWithArray:dataArr];
-                completion(nil,array);
-            }
-        }
-    } failureBlock:^(NSError *error) {
-        if (completion) {
-            NSArray *array = [NSArray arrayWithArray:dataArr];
-            completion(error,array);
-        }
-    }];
-    
++(void)requestImageWithAsset:(PHAsset *)asset completionHandler:(void (^)(UIImage *, NSString *, BOOL))handler{
+    [shareTool requestImageWithAsset:asset completionHandler:handler];
 }
--(void)fetchAssetsWithAlbumsGroup:(ALAssetsGroup *)group andCompletion:(enumrationBlock)finish{
-    if (!group) {
-        return;
+
++ (void)requestImageWithAsset:(PHAsset *)asset targetSize:(CGSize)size completionHandler:(void (^)(UIImage *, NSString *, BOOL))handler {
+    [shareTool requestImageWithAsset:asset targetSize:size completionHandler:handler];
+}
++(void)requestPosterForAssetsCollection:(PHAssetCollection *)collection completionHandler:(void (^)(UIImage *, NSString *, BOOL))completion {
+    [shareTool requestPosterForAssetsCollection:collection completionHandler:completion];
+}
++(void)requestCountOfAssetsInCollection:(PHAssetCollection *)collection completionHandler:(void (^)(NSUInteger, bool))completion {
+    [shareTool requestCountOfAssetsInCollection:collection completionHandler:completion];
+}
++ (NSString *)MD5:(NSString *)str {
+    
+    const char *cStr = [str UTF8String];
+    unsigned char result[16];
+    CC_MD5( cStr, (int)strlen(cStr), result );
+    return [NSString stringWithFormat:
+            @"%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
+            result[0], result[1], result[2], result[3],
+            result[4], result[5], result[6], result[7],
+            result[8], result[9], result[10], result[11],
+            result[12], result[13], result[14], result[15]
+            ];
+}
+#pragma mark -  dynamic method
+- (NSString *)getFilePathWithFilename:(NSString *)filename {
+    NSString *path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *cacheDirectory = [path stringByAppendingPathComponent:CACHE_PATH];
+    NSFileManager *manager = [NSFileManager defaultManager];
+    BOOL isDirectory = nil;
+    if ([manager fileExistsAtPath:cacheDirectory isDirectory:&isDirectory]) { //如果存在这个文件
+        if (isDirectory) {
+            return [cacheDirectory stringByAppendingPathComponent:filename];
+        }
     }
-   __block enumrationBlock completion = [finish copy];
-    //before fetch data ,check if there has cached data
-    NSArray *cacheArr = [self fetchCachedDataWithGroup:group];
-    if (cacheArr) {
-        if (completion) {
-            completion(nil,cacheArr);
+    else {
+        if ([manager createDirectoryAtPath:cacheDirectory withIntermediateDirectories:YES attributes:nil error:nil]) {
+            return [cacheDirectory stringByAppendingPathComponent:filename];
+        }
+    }
+    return nil;
+}
+- (NSString *)getFileNameWithAsset:(PHAsset *)asset andSize:(CGSize)size {
+    NSString *md5 = [PFImagePickerTool MD5:[NSString stringWithFormat:@"%@%@",NSStringFromCGSize(size), asset.localIdentifier]];
+    return [NSString stringWithFormat:@"%@.png", md5];
+}
+- (CGSize)caculateSuitSizeWithTargetSize:(CGSize)targetSize {
+    CGFloat maxWidth = [UIScreen mainScreen].bounds.size.width;
+    CGFloat maxHeight = [UIScreen mainScreen].bounds.size.height;
+    CGFloat suitWidth = maxWidth;
+    CGFloat suitHeight= maxHeight;
+    if (suitWidth * targetSize.height / targetSize.width < maxHeight) {
+        suitHeight = suitWidth * targetSize.height / targetSize.width;
+    }
+    else {
+        suitWidth = suitHeight * targetSize.width / targetSize.height;
+    }
+    return CGSizeMake(suitWidth, suitHeight);
+}
+- (void)requestImageWithAsset:(PHAsset *)asset targetSize:(CGSize)size completionHandler:(void (^)(UIImage *, NSString *, BOOL))handler {
+    CGSize suitSize = [self caculateSuitSizeWithTargetSize:size];
+     NSString *filename = [self getFileNameWithAsset:asset andSize:suitSize]; //根据缓存取出
+    __block void (^completion)(UIImage *, NSString *, BOOL) = [handler copy];
+    if (asset == nil) {
+        [PFImagePickerTool excuteOnMainThreadWithOperation:^{
+            completion(nil, nil, NO);
+            completion = nil;
+        }];
+    }
+    else {
+        UIImage *image = imageDic[filename];
+        if (image) {
+            [PFImagePickerTool excuteOnMainThreadWithOperation:^{
+                completion(image, nil, YES);
+                completion = nil;
+            }];
             return;
         }
-    }
-    ALAssetsFilter *filter = nil;
-    switch (self.filter) {
-        case PFImagePickerTypeNone:
-            filter = [ALAssetsFilter allAssets];
-            break;
-        case PFImagePickerTypePhotos:
-            filter = [ALAssetsFilter allPhotos];
-            break;
-        case PFImagePickerTypeVideos:
-            filter = [ALAssetsFilter allVideos];
-            break;
-        default:
-            break;
-    }
-     __block NSInteger count = 0;
-     __block NSMutableArray *dataArr = [NSMutableArray new];
-    [group setAssetsFilter:filter];
-    void(^checkCount)() = ^(){
-        if (count == group.numberOfAssets) {
-            if (completion) {
-                NSArray *array = [NSArray arrayWithArray:dataArr];
-                NSURL *url = [group valueForProperty:ALAssetsGroupPropertyURL];
-                cacheDic[url.absoluteString] = array;//store the data
-                completion(nil,array);
-                completion = nil;
-            }
-        }
-    };
-    [group enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
-        @autoreleasepool {
-        if (result) {
-                  ALAssetModel *model = nil;
-                  model = [selectedDic objectForKey:result.defaultRepresentation.url.absoluteString];
-            
-            if (!model) {
-                  model = [[ALAssetModel alloc] init];
-                  model.asset = result;
-                  model.typeString = [result valueForProperty:ALAssetPropertyType];
+        else {
+            [PFImagePickerTool excuteOnGlobalThreadWithOperation:^{
+                CGFloat cropSideLength = MIN(asset.pixelWidth, asset.pixelHeight);
+                CGRect square = CGRectMake(0, 0, cropSideLength, cropSideLength);
+                CGRect cropRect = CGRectApplyAffineTransform(square,
+                                                             CGAffineTransformMakeScale(1.0 / asset.pixelWidth,
+                                                                                        1.0 / asset.pixelHeight));
                 
-            }
-                  [dataArr addObject:model];
-                  count++;
-        }else{
-            checkCount();
-            *stop = YES;
-            
-          }
-            
+               
+                PHImageRequestOptions *options = [PHImageRequestOptions new];
+                options.synchronous = YES;
+                options.resizeMode = PHImageRequestOptionsResizeModeExact;
+                options.deliveryMode = PHImageRequestOptionsDeliveryModeFastFormat;
+                options.normalizedCropRect = cropRect;
+                [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:suitSize contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+                    if (filename) {
+                        if (imageDic.allValues.count > MAX) {
+                            [imageDic removeObjectForKey:imageDic.allKeys.firstObject];
+                        }
+                        [imageDic setObject:result forKey:filename];
+                    }
+                    [PFImagePickerTool excuteOnMainThreadWithOperation:^{
+                        NSString *imagePath = [self filterFilePrefixWithFileURL:info[@"PHImageFileURLKey"]];
+                        completion(result, imagePath, YES);
+                            completion = nil;
+                        
+                    }];
+                }];
+            }];
         }
-    }];
+    }
+
 }
--(void)reloadAssetsWithAlbumsGroup:(ALAssetsGroup *)group andCompletion:(enumrationBlock)finish{
-    if (!group) {
-        return;
+
+- (void)saveDataWithImage:(UIImage *)image andFilename:(NSString *)fileName {
+    
+}
+- (void)requestCountOfAssetsInCollection:(PHAssetCollection *)collection completionHandler:(void (^)(NSUInteger, bool))completion {
+        PHFetchOptions *options = [[PHFetchOptions alloc] init];
+        options.includeHiddenAssets = YES;
+        
+        PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:options];
+        if (result) {
+            completion(result.count, YES);
+        }
+        else {
+            completion(0, NO);
+        }
+}
+- (NSString *)filterFilePrefixWithFileURL: (NSURL *)url {
+    NSString *path = url.absoluteString;
+    NSString *prefix = @"file://";
+    if ([path hasPrefix:prefix]) {
+        path = [path stringByReplacingOccurrencesOfString:prefix withString:@""];
     }
-    __block enumrationBlock completion = [finish copy];
-    ALAssetsFilter *filter = nil;
-    switch (self.filter) {
-        case PFImagePickerTypeNone:
-            filter = [ALAssetsFilter allAssets];
-            break;
-        case PFImagePickerTypePhotos:
-            filter = [ALAssetsFilter allPhotos];
-            break;
-        case PFImagePickerTypeVideos:
-            filter = [ALAssetsFilter allVideos];
-            break;
-        default:
-            break;
+    return path;
+}
+- (NSString *)getPosterPathWithIdentifier:(NSString *)identifier {
+    NSDictionary *dic = [cacheDic objectForKey:identifier];
+    return [self filterFilePrefixWithFileURL:dic[@"PHImageFileURLKey"]];
+}
+- (void)requestImageWithAsset:(PHAsset *)asset completionHandler:(void (^)(UIImage *, NSString *, BOOL))completion {
+    if (asset == nil) {
+        [PFImagePickerTool excuteOnMainThreadWithOperation:^{
+            completion(nil, nil, NO);
+        }];
     }
-    __block NSInteger count = 0;
+    else {
+        NSString *path = [self getPosterPathWithIdentifier:asset.localIdentifier];
+        NSString *prefix = @"file://";
+        if ([path hasPrefix:prefix]) {
+            path = [path substringFromIndex:prefix.length];
+        }
+        UIImage *image = [[UIImage alloc] initWithContentsOfFile:path];
+        if (image) {
+            [PFImagePickerTool excuteOnMainThreadWithOperation:^{
+                 completion(image, path, YES);
+            }];
+            return;
+
+        }
+        else {
+            [PFImagePickerTool excuteOnGlobalThreadWithOperation:^{
+                PHImageRequestOptions *options = [PHImageRequestOptions new];
+                options.synchronous = YES;
+                options.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
+                
+                [[PHCachingImageManager defaultManager] requestImageDataForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+                    UIImage *image = [UIImage imageWithData:imageData];
+
+                    NSString *imagePath = [self filterFilePrefixWithFileURL:info[@"PHImageFileURLKey"]];
+                    [PFImagePickerTool excuteOnMainThreadWithOperation:^{
+                        if (info) {
+                            [cacheDic setObject:info forKey:asset.localIdentifier];
+                        }
+                        completion(image,imagePath, YES);
+                    }];
+                }];
+
+            }];
+        }
+    }
+}
+- (void)requestPosterForAssetsCollection:(PHAssetCollection *)collection completionHandler:(void (^)(UIImage *, NSString *, BOOL))completion {
+    if (collection == nil) {
+        [PFImagePickerTool excuteOnMainThreadWithOperation:^{
+            completion(nil,nil,NO);
+        }];
+    }
+    else {
+        
+        //request from cache
+        NSString *posterPath = [self getPosterPathWithIdentifier:collection.localIdentifier];
+        if (posterPath != nil) {
+            UIImage *image = [[UIImage alloc] initWithContentsOfFile:posterPath];
+            [PFImagePickerTool excuteOnMainThreadWithOperation:^{
+              completion(image,posterPath, YES);
+            }];
+            return;
+        }
+        else {
+            PHFetchOptions *options = [[PHFetchOptions alloc] init];
+            
+            options.includeHiddenAssets = YES;
+            options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+            PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:options];
+            [result enumerateObjectsUsingBlock:^(PHAsset *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                if (idx == 0) {
+                    * stop = YES;
+                    [PFImagePickerTool excuteOnGlobalThreadWithOperation:^{
+                        PHImageRequestOptions *options = [PHImageRequestOptions new];
+                        options.synchronous = YES;
+                        options.deliveryMode = PHImageRequestOptionsDeliveryModeFastFormat;
+                        
+                        [[PHCachingImageManager defaultManager] requestImageDataForAsset:obj options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+                            UIImage *image = [UIImage imageWithData:imageData];
+                            NSString *imagePath = [self filterFilePrefixWithFileURL:info[@"PHImageFileURLKey"]];
+                            [PFImagePickerTool excuteOnMainThreadWithOperation:^{
+                                if (info) {
+                                    [cacheDic setObject:info forKey:obj.localIdentifier];
+                                }
+                                completion(image, imagePath, YES);
+                            }];
+                        }];
+                    }];
+                }
+            }];
+      }
+    }
+}
+- (void)fetchCollectionWithCompletion:(enumrationBlock)finish {
+    
+    PHFetchResult *assetsFetchResults = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAny options:nil];
+    
     __block NSMutableArray *dataArr = [NSMutableArray new];
-    [group setAssetsFilter:filter];
-    void(^checkCount)() = ^(){
-        if (count == group.numberOfAssets) {
-            if (completion) {
-                NSArray *array = [NSArray arrayWithArray:dataArr];
-                NSURL *url = [group valueForProperty:ALAssetsGroupPropertyURL];
-                cacheDic[url.absoluteString] = array;//store the data
-                completion(nil,array);
+    __block enumrationBlock completion = finish;
+    
+    [assetsFetchResults enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        
+        if ([obj isKindOfClass:[PHAssetCollection class]])
+        {
+            PHAssetCollection *one = (PHAssetCollection *)obj;
+            if ([one.localizedTitle isEqualToString:bundleName]) {
+                yourCollection = one;
+            }
+        
+            PHAssetCollection *assetCollection = (PHAssetCollection *)obj;
+            [dataArr addObject:assetCollection];
+            
+        }
+        
+    }];
+    PHFetchResult *assetsFetchResults2 = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAny options:nil];
+    [assetsFetchResults2 enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        
+        if ([obj isKindOfClass:[PHAssetCollection class]])
+        {
+            PHAssetCollection *one = (PHAssetCollection *)obj;
+            if ([one.localizedTitle isEqualToString:bundleName]) {
+                yourCollection = one;
+            }
+
+            PHAssetCollection *assetCollection = (PHAssetCollection *)obj;
+            [dataArr addObject:assetCollection];
+            if (idx == assetsFetchResults2.count - 1 && completion != nil) {
+                shareTool.collections = dataArr;
+                completion(nil,dataArr);
                 completion = nil;
             }
         }
-    };
-    [group enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
-        @autoreleasepool {
-            if (result) {
-                ALAssetModel *model = nil;
-                model = [selectedDic objectForKey:result.defaultRepresentation.url.absoluteString];
-                
-                if (!model) {
-                    model = [[ALAssetModel alloc] init];
-                    model.asset = result;
-                    model.typeString = [result valueForProperty:ALAssetPropertyType];
-                    
-                }
-                [dataArr addObject:model];
-                count++;
-            }else{
-                checkCount();
-                *stop = YES;
-                
-            }
-            
-        }
+        
     }];
 
 }
--(NSArray *)fetchCachedDataWithGroup:(ALAssetsGroup *)group
-{
+- (void)fetchAssetsWithAssetCollection:(PHAssetCollection *)collection andCompletion:(enumrationBlock)finish withCache:(BOOL)usingCache{
+   
+    if (!collection) {
+        finish(nil,nil);
+        return;
+    }
+    
+    __block enumrationBlock completion = finish;
+    
+    if (usingCache) {//使用cache
+    NSArray *cacheArr = [self fetchCachedDataWithCollection:collection];
+    
+    if (cacheArr && completion != nil) {
+            completion(nil,cacheArr);
+            completion = nil;
+        return;
+    }
+    }
+    
+    PHFetchOptions *options = [[PHFetchOptions alloc] init];
+    options.includeHiddenAssets = YES;
+    
+    PHFetchResult *result = [PHAsset fetchAssetsInAssetCollection:collection options:options];
+    __block NSMutableArray *dataArr = [NSMutableArray new];
+    
+    [result enumerateObjectsUsingBlock:^(PHAsset *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        
+        if (obj && (obj.mediaType == self.filter || self.filter == PHAssetMediaTypeUnknown)) {
+            AssetModel *model = nil;
+            model = [selectedDic objectForKey:obj.localIdentifier];
+            model.isSelected = YES;
+            if (!model) {
+                model = [[AssetModel alloc] init];
+                model.asset = obj;
+                model.collection = collection;
+                model.mediaType = obj.mediaType;
+                model.isSelected = NO;
+            }
+            [dataArr addObject:model];
+        }
+        
+        if (idx == result.count - 1 && completion != nil) {
+            
+            NSString *key = [NSString stringWithFormat:@"%@%lu",collection.localIdentifier,(unsigned long)self.filter];
+            cacheDic[key] = dataArr;
+            completion(nil,dataArr);
+        }
+    }];
+}
+- (NSArray *)fetchCachedDataWithCollection:(PHAssetCollection *)colletion {
     NSArray *dataArr = [NSMutableArray new];
-    NSURL *url = [group valueForProperty:ALAssetsGroupPropertyURL];
-    dataArr = [cacheDic objectForKey:url.absoluteString];
+    dataArr = [cacheDic objectForKey: [NSString stringWithFormat:@"%@%lu",colletion.localIdentifier,(unsigned long)self.filter]];
     if (dataArr.count == 0 || dataArr == nil) {//there has no cached data
         return nil;
     }
     return dataArr;
-}
-+(void)captureImageWithView:(UIView *)view andWriteToGroup:(ALAssetsGroup *)group withFinishBlock:(void (^)(NSError *))completion{
-    void(^returnBlock)(NSError *error) = [completion copy];
-    __block NSError *resultError = nil;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        UIGraphicsBeginImageContextWithOptions(view.frame.size, NO, 0);
-        CGContextRef context = UIGraphicsGetCurrentContext();
-        [view.layer renderInContext:context];
-        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-        [library writeImageToSavedPhotosAlbum:image.CGImage metadata:nil completionBlock:^(NSURL *assetURL, NSError *error) {
-            if (error) {    //写入错误
-                resultError = error;
-            }
-            else{
-                [library assetForURL:assetURL resultBlock:^(ALAsset *asset) {
-                    if (asset) {
-                        BOOL result = [group addAsset:asset];
-                        NSLog(@"写入的结果---------%d",result);
-                    }
-                } failureBlock:^(NSError *error) {
-                    
-                    resultError = error;
-                }];
 
-                
-            }
-            
-        }];
-        dispatch_async(dispatch_get_main_queue(), ^{
-              returnBlock(resultError);
-        });
-    });
-    
 }
-#pragma mark - about notification
--(void)alassetsLibraryChangeNotification:(NSNotification *)info
-{
-    NSDictionary *infoDic = info.userInfo;
-    NSSet *set = [infoDic objectForKey:ALAssetLibraryUpdatedAssetGroupsKey];
-    
-    for (NSURL *updateGroupURL in set) {
-        
-       __block ALAssetsGroup *resultGroup = nil;
-        
-        [library groupForURL:updateGroupURL resultBlock:^(ALAssetsGroup *group) {
-            
-            resultGroup = group;
-            
-        } failureBlock:^(NSError *error) {
-            
+- (void)removeCacheDataWithCollection:(PHAssetCollection *)collection {
+    //移除
+    [cacheDic removeObjectForKey: [NSString stringWithFormat:@"%@%lu",collection.localIdentifier,(unsigned long)self.filter]];
+
+}
+- (void)reloadAssetsWithCollection:(PHAssetCollection *)collection andCompletion:(enumrationBlock)finish {
+    [shareTool fetchAssetsWithAssetCollection:collection andCompletion:finish withCache:NO];
+}
++ (void)captureImage:(UIImage *)image handler:(void (^)(BOOL))completion {
+    __block void (^handler)(BOOL) = [completion copy];
+    [self excuteOnMainThreadWithOperation:^{
+        [self requestAppCollectionWithHandler:^(PHAssetCollection *collection, bool success) {
+            if (success) {
+                
+                [library performChanges:^{
+                    PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
+                    PHAssetCollectionChangeRequest *collectionChange = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
+                    [collectionChange addAssets:@[request.placeholderForCreatedAsset]];
+                    
+                } completionHandler:^(BOOL success, NSError * _Nullable error) {
+                    [self excuteOnMainThreadWithOperation:^{
+                        handler(success);
+                        handler = nil;
+                    }];
+                    
+                }];
+            }
+            else {
+                [self excuteOnMainThreadWithOperation:^{
+                    handler(NO);
+                    handler = nil;
+                }];
+            }
         }];
-        
-        [cacheDic removeObjectForKey:updateGroupURL.absoluteString];
-        [self fetchAssetsWithAlbumsGroup:resultGroup andCompletion:nil];
-        
+
+    }];
+}
++ (void)captureImageWithView:(UIView *)view withFinishBlock:(void (^)(BOOL, UIImage *))completion {
+    __block void (^handler)(BOOL, UIImage *) = [completion copy];
+    UIGraphicsBeginImageContextWithOptions(view.frame.size, NO, 0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [view.layer renderInContext:context];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    [self requestAppCollectionWithHandler:^(PHAssetCollection *collection, bool success) {
+        if (success) {
+            
+            [library performChanges:^{
+                PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
+                PHAssetCollectionChangeRequest *collectionChange = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
+                [collectionChange addAssets:@[request.placeholderForCreatedAsset]];
+                
+            } completionHandler:^(BOOL success, NSError * _Nullable error) {
+               [self excuteOnMainThreadWithOperation:^{
+                   handler(success, image);
+                   handler = nil;
+               }];
+
+            }];
+        }
+        else {
+            [self excuteOnMainThreadWithOperation:^{
+                handler(NO, image);
+                handler = nil;
+            }];
+        }
+    }];
+     UIGraphicsEndImageContext();
+}
++ (void)enumToGetImage:(NSArray<AssetModel *> *)models andHandler:(void (^)(BOOL *, NSUInteger, UIImage *, NSString *))completion {
+    __block BOOL stop = NO;
+    for (NSUInteger index = 0; index < models.count; index ++) {
+        if (!stop) {
+            AssetModel *model = models[index];
+            [self requestFastImageWithAsset:model.asset Handler:^(UIImage *image, NSString *UTI, BOOL succees) {
+                if (succees) {
+                    completion(&stop, index, image,UTI);
+                }
+            }];
+        }
+        else{
+            break;
+        }
     }
-    [self postChangeNotification];
+}
++ (void)requestFastImageWithAsset:(PHAsset *)asset Handler:(void (^)(UIImage *, NSString *, BOOL))handler{
+    PHImageRequestOptions *options = [PHImageRequestOptions new];
+    options.synchronous = YES;
+    options.resizeMode = PHImageRequestOptionsResizeModeFast;
+    options.deliveryMode = PHImageRequestOptionsDeliveryModeFastFormat;
+    
+    [[PHCachingImageManager defaultManager] requestImageForAsset:asset targetSize:CGSizeMake(asset.pixelWidth * 0.3, asset.pixelHeight * 0.3) contentMode:PHImageContentModeAspectFit options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        NSLog(@"currentThread-------%@",[NSThread currentThread]);
+        NSLog(@"size------%@",NSStringFromCGSize(result.size));
+        NSString *uti = info[@"PHImageFileUTIKey"];
+        handler(result, uti,YES);
+    }];
+}
++ (void)captureImageWithView:(UIView *)view andWriteToCollection:(PHAssetCollection *)collection withFinishBlock:(void (^)(NSError *, BOOL))completion {
+    UIGraphicsBeginImageContextWithOptions(view.frame.size, NO, 0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [view.layer renderInContext:context];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    [self excuteOnGlobalThreadWithOperation:^{
+       UIGraphicsBeginImageContextWithOptions(view.frame.size, NO, 0);
+       [library performChanges:^{
+           PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
+           
+           PHAssetCollectionChangeRequest *collectionRequest = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
+           
+           PHObjectPlaceholder *holder = [request placeholderForCreatedAsset];
+           
+           [collectionRequest addAssets:@[holder]];
+            UIGraphicsEndImageContext();
+           
+       } completionHandler:^(BOOL success, NSError * _Nullable error)
+        {
+            completion(error,success);
+        }];
+
+   }];
+    UIGraphicsEndImageContext();
+}
+
+#pragma mark - about notification
+- (void)photoLibraryDidChange:(PHChange *)changeInstance {
+    [PFImagePickerTool excuteOnMainThreadWithOperation:^{
+        for (PHAssetCollection *collection  in self.collections) {//遍历,查看是哪个相册变化了
+            if ([changeInstance changeDetailsForObject:collection]) {
+                [shareTool reloadAssetsWithCollection:collection andCompletion:nil];
+                [shareTool removeCacheDataWithCollection:collection];
+            }
+        }
+
+    }];
+    [shareTool postChangeNotification];
 }
 -(void)postChangeNotification
 {
     //post notification
-    [[NSNotificationCenter defaultCenter] postNotificationName:ALAssetsChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:PhotosChangeNotification object:nil];
 }
 -(void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:ALAssetsLibraryChangedNotification object:nil];
+    [library unregisterChangeObserver:shareTool];
 }
 @end

@@ -8,8 +8,8 @@
 
 #import <UIKit/UIKit.h>
 @class PFImagePickerController;
-@class ALAssetsGroup;
+@class PHAssetCollection;
 @interface PFAssetsController : UIViewController
 @property(nonatomic,weak)PFImagePickerController *imagePickerController;
-@property(nonatomic,strong)ALAssetsGroup *group;
+@property(nonatomic,strong)PHAssetCollection *collection;
 @end
