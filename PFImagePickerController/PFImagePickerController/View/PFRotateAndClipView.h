@@ -16,5 +16,4 @@
 - (void)restore;
 - (void)clipActionWithHandler:(void(^)(UIImage *result, PFRotateAndClipView *editView))completion;
 - (void)rotate;
-- (void)dismiss;
 @end
