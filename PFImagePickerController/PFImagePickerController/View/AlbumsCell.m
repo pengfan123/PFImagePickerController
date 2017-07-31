@@ -26,7 +26,7 @@
     }
     self.delegate   = delegate;
     self.collection = collection;
-    self.posterView.image = [PFImagePickerTool loadImageWithName:@"placeholder"];
+    self.posterView.image = [UIImage imageNamed:@"placeholder"];
     return self;
 
 }

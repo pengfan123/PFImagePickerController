@@ -80,56 +80,46 @@ static NSMutableArray *tasks;
     [shareTool addObserver];
     
 }
-+ (void)addOperation:(operationBlock)operation {
-    [shareTool addOperation:operation];
-}
-- (void)addOperation:(operationBlock) operation {
-    [tasks addObject:operation];
-    if (tasks.count > MAX) {
-        [tasks removeObject:tasks.firstObject];
-    }
-}
-- (void)addObserver {
-        CFRunLoopRef runloopRef = CFRunLoopGetCurrent();
-        CFRunLoopObserverContext context = {
-            0,
-            (__bridge void *)shareTool,
-            &CFRetain,
-            &CFRelease,
-            NULL
-        };
-        CFRunLoopObserverRef observerRef = CFRunLoopObserverCreate(NULL, kCFRunLoopBeforeWaiting, YES, 0, &callBack, &context);
-        CFRunLoopAddObserver(runloopRef, observerRef, kCFRunLoopCommonModes);
-        CFRelease(observerRef);
-}
-void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
-   operationBlock task = tasks.firstObject;
-    if (task) {
-        task();
-        [tasks removeObject:task];
-    }
-}
 #pragma mark - static method
-+(UIColor *)shadowColor
-{
-    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"PFImagePickerController" ofType:@"bundle"];
-    NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
-    NSString *imagePath = [bundle pathForResource:@"shadow" ofType:@"png"];
-    return [UIColor colorWithPatternImage:[UIImage imageWithContentsOfFile:imagePath]];
-}
+//设置资源的类型
 + (void)setFilterType:(PHAssetMediaType)type {
     shareTool.filter = type;
 }
-+(void)setMaxCount:(NSUInteger)maxCount
-{
+//获取已经选择的资源的数量
++ (NSInteger)selectedCount {
+    return selectedDic.count;
+}
+//设置最大的可选数量
++ (void)setMaxCount:(NSUInteger)maxCount {
     shareTool.maxCount = maxCount;
 }
-+(void)setMinumCount:(NSUInteger)minumCount
-{
-   shareTool.minumCount = minumCount;
+//设置最小的可选数量
++ (void)setMinumCount:(NSUInteger)minumCount {
+    shareTool.minumCount = minumCount;
 }
-+(BOOL)checkSelectionStatus
-{
+//获取已选模型
++ (NSArray *)getSelectedAssetsArr {
+    return [selectedDic allValues];
+}
+//清除缓存数据
++ (void)restoreAction {
+    [selectedDic removeAllObjects];
+    [cacheDic removeAllObjects];
+    shareTool.minumCount = 0;
+    shareTool.maxCount   = 10;
+    shareTool.filter = PHAssetMediaTypeUnknown;
+}
+//判断是否可选(如果超过了最大可选数量就不可选)
++ (BOOL)canSelect {
+    if (selectedDic.allValues.count > shareTool.maxCount) {
+        return NO;
+    }else{
+        return YES;
+    }
+}
+
+//检查选择的模型的个数是否符合大于minumCount并且小于maxCount
++(BOOL)checkSelectionStatus {
     BOOL status = NO;
     NSUInteger count = [selectedDic allValues].count;
     if (count >= shareTool.minumCount && count <= shareTool.maxCount) {
@@ -137,85 +127,23 @@ void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *i
     }
     return status;
 }
-
-+ (void)excuteOperation:(void(^)())operation onQueue:(dispatch_queue_t)queue {
-    if (queue == NULL) {
-        return;
-    }
-    __block void(^handler)() = [operation copy];
-    dispatch_async(queue, ^{
-        handler();
-        handler = nil;
-    });
+//添加操作block(任务)
++ (void)addOperation:(operationBlock)operation {
+    [shareTool addOperation:operation];
 }
-+ (void)excuteOnMainThreadWithOperation:(void(^)())operation {
-    [self excuteOperation:operation onQueue:dispatch_get_main_queue()];
-}
-
-+ (void)excuteOnGlobalThreadWithOperation:(void(^)())operation {
-    [self excuteOperation:operation onQueue:dispatch_get_main_queue()];
-}
-+ (void)requestAppCollectionWithHandler:(void(^)(PHAssetCollection *, bool))completion{
-    __block void(^handler)(PHAssetCollection *, bool) = [completion copy];
-    if (yourCollection != nil) {
-        handler(yourCollection,YES);
-        handler = nil;
-        return;
-    }
-    else {
-            [shareTool.collections enumerateObjectsUsingBlock:^(PHAssetCollection *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                if ([obj.localizedTitle isEqualToString:bundleName]) {
-                    
-                    yourCollection = obj;
-                    [self excuteOnMainThreadWithOperation:^{
-                        if (handler) {
-                            handler(yourCollection,YES);
-                            handler = nil;
-                        }
-                    }];
-                    return ;
-                    *stop = YES;
-                }
-             }];
-            //遍历完,如果没有就创建一个
-            NSError *error = nil;
-            __block NSString *identifier = nil;
-            [library performChangesAndWait:^{
-                PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:bundleName];
-                identifier = request.placeholderForCreatedAssetCollection.localIdentifier;
-            } error:&error];
-            
-            //返回处理结果
-                if (error == nil && identifier != nil) {
-                    PHFetchResult *result = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[identifier] options:nil];
-                    yourCollection = result.firstObject;
-                    if (handler) {
-                        handler(yourCollection,YES);
-                        handler = nil;
-                    }
-                    
-                } else {
-                    if (handler) {
-                        handler(nil,NO);
-                        handler = nil;
-                    }
-                }
-    }
-}
-+(void)fetchCollectionsWithCompletion:(enumrationBlock)finish
-{
+//遍历获取所有资源集合
++ (void)fetchCollectionsWithCompletion:(enumrationBlock)finish {
     [shareTool fetchCollectionWithCompletion:finish];
 }
-
+//获取集合下的资源
 +(void)fetchAssetsWithAssetCollection:(PHAssetCollection *)collection andCompletion:(enumrationBlock)finish {
     [shareTool fetchAssetsWithAssetCollection:collection andCompletion:finish withCache:YES];
 }
-
-//reload assets for specify collection (this method will be called when photo library has been changed(eg. photos has been edited,deleted...))
+//针对于刷新数据的,可能图库资源发生改变,这时候要及时刷新展示的数据
 + (void)reloadAssetsWithCollection:(PHAssetCollection *)collection andCompletion:(enumrationBlock)finish {
     [shareTool reloadAssetsWithCollection:collection andCompletion:finish];
 }
-
+// 操作模型(删除非选的,添加选择的)
 + (BOOL)storeSelectedOrUnselectedModel:(AssetModel *)model
 {
     if (!model) {
@@ -234,51 +162,219 @@ void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *i
         [selectedDic removeObjectForKey:model.asset.localIdentifier];
         return NO;
     }
-   
+    
 }
-+(BOOL)canSelect
-{
-    if (selectedDic.allValues.count > shareTool.maxCount) {
-        return NO;
-    }else{
-        return YES;
+
+void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
+   operationBlock task = tasks.firstObject;
+    if (task) {
+        task();
+        [tasks removeObject:task];
     }
 }
-+ (NSInteger)selectedCount {
-    return selectedDic.count;
+//保留编辑的图片
++ (void)captureImage:(UIImage *)image handler:(void (^)(BOOL))completion {
+    __block void (^handler)(BOOL) = [completion copy];
+    [self excuteOnMainThreadWithOperation:^{
+        [self requestAppCollectionWithHandler:^(PHAssetCollection *collection, bool success) {
+            if (success) {
+                
+                [library performChanges:^{
+                    PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
+                    PHAssetCollectionChangeRequest *collectionChange = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
+                    [collectionChange addAssets:@[request.placeholderForCreatedAsset]];
+                    
+                } completionHandler:^(BOOL success, NSError * _Nullable error) {
+                    [self excuteOnMainThreadWithOperation:^{
+                        handler(success);
+                        handler = nil;
+                    }];
+                    
+                }];
+            }
+            else {
+                [self excuteOnMainThreadWithOperation:^{
+                    handler(NO);
+                    handler = nil;
+                }];
+            }
+        }];
+        
+    }];
 }
-+ (NSArray *)getSelectedAssetsArr {
-    return [selectedDic allValues];
+//保存编辑过的View到指定的集合
++ (void)captureImageWithView:(UIView *)view andWriteToCollection:(PHAssetCollection *)collection withFinishBlock:(void (^)(NSError *, BOOL))completion {
+    UIGraphicsBeginImageContextWithOptions(view.frame.size, NO, 0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [view.layer renderInContext:context];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    [self excuteOnGlobalThreadWithOperation:^{
+        UIGraphicsBeginImageContextWithOptions(view.frame.size, NO, 0);
+        [library performChanges:^{
+            PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
+            
+            PHAssetCollectionChangeRequest *collectionRequest = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
+            
+            PHObjectPlaceholder *holder = [request placeholderForCreatedAsset];
+            
+            [collectionRequest addAssets:@[holder]];
+            UIGraphicsEndImageContext();
+            
+        } completionHandler:^(BOOL success, NSError * _Nullable error)
+         {
+             completion(error,success);
+         }];
+        
+    }];
+    UIGraphicsEndImageContext();
 }
-
-+ (void)restoreAction {
-    [selectedDic removeAllObjects];
-    [cacheDic removeAllObjects];
-    shareTool.minumCount = 0;
-    shareTool.maxCount   = 10;
-    shareTool.filter = PHAssetMediaTypeUnknown;
+//保留编辑的View
++ (void)captureImageWithView:(UIView *)view withFinishBlock:(void (^)(BOOL, UIImage *))completion {
+    __block void (^handler)(BOOL, UIImage *) = [completion copy];
+    UIGraphicsBeginImageContextWithOptions(view.frame.size, NO, 0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [view.layer renderInContext:context];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    [self requestAppCollectionWithHandler:^(PHAssetCollection *collection, bool success) {
+        if (success) {
+            
+            [library performChanges:^{
+                PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
+                PHAssetCollectionChangeRequest *collectionChange = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
+                [collectionChange addAssets:@[request.placeholderForCreatedAsset]];
+                
+            } completionHandler:^(BOOL success, NSError * _Nullable error) {
+                [self excuteOnMainThreadWithOperation:^{
+                    handler(success, image);
+                    handler = nil;
+                }];
+                
+            }];
+        }
+        else {
+            [self excuteOnMainThreadWithOperation:^{
+                handler(NO, image);
+                handler = nil;
+            }];
+        }
+    }];
+    UIGraphicsEndImageContext();
 }
-
-+ (UIImage *)loadImageWithName:(NSString *)imageName {
-    if (!imageName) {
-        return nil;
-    }
-    UIImage *image = [UIImage imageNamed:imageName];
-    return image;
-}
-+(void)requestImageWithAsset:(PHAsset *)asset completionHandler:(void (^)(UIImage *, NSString *, BOOL))handler{
-    [shareTool requestImageWithAsset:asset completionHandler:handler];
-}
-
-+ (void)requestImageWithAsset:(PHAsset *)asset targetSize:(CGSize)size completionHandler:(void (^)(UIImage *, NSString *, BOOL))handler {
-    [shareTool requestImageWithAsset:asset targetSize:size completionHandler:handler];
-}
-+(void)requestPosterForAssetsCollection:(PHAssetCollection *)collection completionHandler:(void (^)(UIImage *, NSString *, BOOL))completion {
-    [shareTool requestPosterForAssetsCollection:collection completionHandler:completion];
-}
+//获取集合中资源的数量
 +(void)requestCountOfAssetsInCollection:(PHAssetCollection *)collection completionHandler:(void (^)(NSUInteger, bool))completion {
     [shareTool requestCountOfAssetsInCollection:collection completionHandler:completion];
 }
+//获取准确尺寸的图片(会根据尺寸来裁剪)
++ (void)requestImageWithAsset:(PHAsset *)asset targetSize:(CGSize)size completionHandler:(void (^)(UIImage *, NSString *, BOOL))handler {
+    [shareTool requestImageWithAsset:asset targetSize:size completionHandler:handler];
+}
+//快速获取原图(同步)
++ (void)requestFastImageWithAsset:(PHAsset *)asset Handler:(void (^)(UIImage *, NSString *, BOOL))handler{
+    PHImageRequestOptions *options = [PHImageRequestOptions new];
+    options.synchronous = YES;
+    options.resizeMode = PHImageRequestOptionsResizeModeFast;
+    options.deliveryMode = PHImageRequestOptionsDeliveryModeFastFormat;
+    
+    [[PHCachingImageManager defaultManager] requestImageForAsset:asset targetSize:CGSizeMake(asset.pixelWidth * 0.3, asset.pixelHeight * 0.3) contentMode:PHImageContentModeAspectFit options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+        NSLog(@"currentThread-------%@",[NSThread currentThread]);
+        NSLog(@"size------%@",NSStringFromCGSize(result.size));
+        NSString *uti = info[@"PHImageFileUTIKey"];
+        handler(result, uti,YES);
+    }];
+}
+//获取原图
++(void)requestImageWithAsset:(PHAsset *)asset completionHandler:(void (^)(UIImage *, NSString *, BOOL))handler{
+    [shareTool requestImageWithAsset:asset completionHandler:handler];
+}
+//获取集合的封面图片
++(void)requestPosterForAssetsCollection:(PHAssetCollection *)collection completionHandler:(void (^)(UIImage *, NSString *, BOOL))completion {
+    [shareTool requestPosterForAssetsCollection:collection completionHandler:completion];
+}
+//选择完了之后遍历获取图片
++ (void)enumToGetImage:(NSArray<AssetModel *> *)models andHandler:(void (^)(BOOL *, NSUInteger, UIImage *, NSString *))completion {
+    __block BOOL stop = NO;
+    for (NSUInteger index = 0; index < models.count; index ++) {
+        if (!stop) {
+            AssetModel *model = models[index];
+            [self requestFastImageWithAsset:model.asset Handler:^(UIImage *image, NSString *UTI, BOOL succees) {
+                if (succees) {
+                    completion(&stop, index, image,UTI);
+                }
+            }];
+        }
+        else{
+            break;
+        }
+    }
+}
+//在线程上执行操作
++ (void)excuteOperation:(void(^)())operation onQueue:(dispatch_queue_t)queue {
+    if (queue == NULL) {
+        return;
+    }
+    __block void(^handler)() = [operation copy];
+    dispatch_async(queue, ^{
+        handler();
+        handler = nil;
+    });
+}
+//在主队列上执行操作
++ (void)excuteOnMainThreadWithOperation:(void(^)())operation {
+    [self excuteOperation:operation onQueue:dispatch_get_main_queue()];
+}
+//在全局队列上执行操作
++ (void)excuteOnGlobalThreadWithOperation:(void(^)())operation {
+    [self excuteOperation:operation onQueue:dispatch_get_main_queue()];
+}
+//获取对应当前APP的资源集合(以应用的名字来命名的,如果没有就会创建一个)
++ (void)requestAppCollectionWithHandler:(void(^)(PHAssetCollection *, bool))completion{
+    __block void(^handler)(PHAssetCollection *, bool) = [completion copy];
+    if (yourCollection != nil) {
+        handler(yourCollection,YES);
+        handler = nil;
+        return;
+    }
+    else {
+        [shareTool.collections enumerateObjectsUsingBlock:^(PHAssetCollection *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([obj.localizedTitle isEqualToString:bundleName]) {
+                
+                yourCollection = obj;
+                [self excuteOnMainThreadWithOperation:^{
+                    if (handler) {
+                        handler(yourCollection,YES);
+                        handler = nil;
+                    }
+                }];
+                return ;
+                *stop = YES;
+            }
+        }];
+        //遍历完,如果没有就创建一个
+        NSError *error = nil;
+        __block NSString *identifier = nil;
+        [library performChangesAndWait:^{
+            PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:bundleName];
+            identifier = request.placeholderForCreatedAssetCollection.localIdentifier;
+        } error:&error];
+        
+        //返回处理结果
+        if (error == nil && identifier != nil) {
+            PHFetchResult *result = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[identifier] options:nil];
+            yourCollection = result.firstObject;
+            if (handler) {
+                handler(yourCollection,YES);
+                handler = nil;
+            }
+            
+        } else {
+            if (handler) {
+                handler(nil,NO);
+                handler = nil;
+            }
+        }
+    }
+}
+//获取唯一的标识符(MD5加密)
 + (NSString *)MD5:(NSString *)str {
     
     const char *cStr = [str UTF8String];
@@ -292,7 +388,28 @@ void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *i
             result[12], result[13], result[14], result[15]
             ];
 }
-#pragma mark -  dynamic method
+
+#pragma mark - dynamic method
+- (void)addObserver {
+    CFRunLoopRef runloopRef = CFRunLoopGetCurrent();
+    CFRunLoopObserverContext context = {
+        0,
+        (__bridge void *)shareTool,
+        &CFRetain,
+        &CFRelease,
+        NULL
+    };
+    CFRunLoopObserverRef observerRef = CFRunLoopObserverCreate(NULL, kCFRunLoopBeforeWaiting, YES, 0, &callBack, &context);
+    CFRunLoopAddObserver(runloopRef, observerRef, kCFRunLoopCommonModes);
+    CFRelease(observerRef);
+}
+
+- (void)addOperation:(operationBlock) operation {
+    [tasks addObject:operation];
+    if (tasks.count > MAX) {
+        [tasks removeObject:tasks.firstObject];
+    }
+}
 - (NSString *)getFilePathWithFilename:(NSString *)filename {
     NSString *path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     NSString *cacheDirectory = [path stringByAppendingPathComponent:CACHE_PATH];
@@ -605,120 +722,6 @@ void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *i
 }
 - (void)reloadAssetsWithCollection:(PHAssetCollection *)collection andCompletion:(enumrationBlock)finish {
     [shareTool fetchAssetsWithAssetCollection:collection andCompletion:finish withCache:NO];
-}
-+ (void)captureImage:(UIImage *)image handler:(void (^)(BOOL))completion {
-    __block void (^handler)(BOOL) = [completion copy];
-    [self excuteOnMainThreadWithOperation:^{
-        [self requestAppCollectionWithHandler:^(PHAssetCollection *collection, bool success) {
-            if (success) {
-                
-                [library performChanges:^{
-                    PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
-                    PHAssetCollectionChangeRequest *collectionChange = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
-                    [collectionChange addAssets:@[request.placeholderForCreatedAsset]];
-                    
-                } completionHandler:^(BOOL success, NSError * _Nullable error) {
-                    [self excuteOnMainThreadWithOperation:^{
-                        handler(success);
-                        handler = nil;
-                    }];
-                    
-                }];
-            }
-            else {
-                [self excuteOnMainThreadWithOperation:^{
-                    handler(NO);
-                    handler = nil;
-                }];
-            }
-        }];
-
-    }];
-}
-+ (void)captureImageWithView:(UIView *)view withFinishBlock:(void (^)(BOOL, UIImage *))completion {
-    __block void (^handler)(BOOL, UIImage *) = [completion copy];
-    UIGraphicsBeginImageContextWithOptions(view.frame.size, NO, 0);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    [view.layer renderInContext:context];
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    [self requestAppCollectionWithHandler:^(PHAssetCollection *collection, bool success) {
-        if (success) {
-            
-            [library performChanges:^{
-                PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
-                PHAssetCollectionChangeRequest *collectionChange = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
-                [collectionChange addAssets:@[request.placeholderForCreatedAsset]];
-                
-            } completionHandler:^(BOOL success, NSError * _Nullable error) {
-               [self excuteOnMainThreadWithOperation:^{
-                   handler(success, image);
-                   handler = nil;
-               }];
-
-            }];
-        }
-        else {
-            [self excuteOnMainThreadWithOperation:^{
-                handler(NO, image);
-                handler = nil;
-            }];
-        }
-    }];
-     UIGraphicsEndImageContext();
-}
-+ (void)enumToGetImage:(NSArray<AssetModel *> *)models andHandler:(void (^)(BOOL *, NSUInteger, UIImage *, NSString *))completion {
-    __block BOOL stop = NO;
-    for (NSUInteger index = 0; index < models.count; index ++) {
-        if (!stop) {
-            AssetModel *model = models[index];
-            [self requestFastImageWithAsset:model.asset Handler:^(UIImage *image, NSString *UTI, BOOL succees) {
-                if (succees) {
-                    completion(&stop, index, image,UTI);
-                }
-            }];
-        }
-        else{
-            break;
-        }
-    }
-}
-+ (void)requestFastImageWithAsset:(PHAsset *)asset Handler:(void (^)(UIImage *, NSString *, BOOL))handler{
-    PHImageRequestOptions *options = [PHImageRequestOptions new];
-    options.synchronous = YES;
-    options.resizeMode = PHImageRequestOptionsResizeModeFast;
-    options.deliveryMode = PHImageRequestOptionsDeliveryModeFastFormat;
-    
-    [[PHCachingImageManager defaultManager] requestImageForAsset:asset targetSize:CGSizeMake(asset.pixelWidth * 0.3, asset.pixelHeight * 0.3) contentMode:PHImageContentModeAspectFit options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
-        NSLog(@"currentThread-------%@",[NSThread currentThread]);
-        NSLog(@"size------%@",NSStringFromCGSize(result.size));
-        NSString *uti = info[@"PHImageFileUTIKey"];
-        handler(result, uti,YES);
-    }];
-}
-+ (void)captureImageWithView:(UIView *)view andWriteToCollection:(PHAssetCollection *)collection withFinishBlock:(void (^)(NSError *, BOOL))completion {
-    UIGraphicsBeginImageContextWithOptions(view.frame.size, NO, 0);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    [view.layer renderInContext:context];
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    [self excuteOnGlobalThreadWithOperation:^{
-       UIGraphicsBeginImageContextWithOptions(view.frame.size, NO, 0);
-       [library performChanges:^{
-           PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
-           
-           PHAssetCollectionChangeRequest *collectionRequest = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
-           
-           PHObjectPlaceholder *holder = [request placeholderForCreatedAsset];
-           
-           [collectionRequest addAssets:@[holder]];
-            UIGraphicsEndImageContext();
-           
-       } completionHandler:^(BOOL success, NSError * _Nullable error)
-        {
-            completion(error,success);
-        }];
-
-   }];
-    UIGraphicsEndImageContext();
 }
 
 #pragma mark - about notification

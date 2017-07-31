@@ -27,9 +27,9 @@
 @implementation AssetCell
 -(void)awakeFromNib{
     [super awakeFromNib];
-    [self.selectBtn setImage:[PFImagePickerTool loadImageWithName:@"unselected"] forState:UIControlStateNormal];
-    [self.selectBtn setImage:[PFImagePickerTool loadImageWithName:@"selected"] forState:UIControlStateSelected];
-    [self.styleView setImage:[PFImagePickerTool loadImageWithName:@"media"]];
+    [self.selectBtn setImage:[UIImage imageNamed:@"unselected"] forState:UIControlStateNormal];
+    [self.selectBtn setImage:[UIImage imageNamed:@"selected"] forState:UIControlStateSelected];
+    [self.styleView setImage:[UIImage imageNamed:@"media"]];
 }
 -(instancetype)initWithCollectionView:(UICollectionView *)collectionView andDataModel:(AssetModel *)dataModel andIndexPath:(NSIndexPath *)indexPath andDelegate:(id<AssetCellDelegate>)delegate{
     self = [collectionView dequeueReusableCellWithReuseIdentifier:@"AssetCell" forIndexPath:indexPath];
@@ -42,7 +42,7 @@
         self.tapRecognizer = tap;
     }
     self.indexPath = indexPath;
-    self.assetView.image = [PFImagePickerTool loadImageWithName:@"big_placeholder"];
+    self.assetView.image = [UIImage imageNamed:@"big_placeholder"];
     self.delegate  = delegate;
     self.dataModel = dataModel;
     return self;
