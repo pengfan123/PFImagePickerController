@@ -36,10 +36,9 @@
 
 - (void)setData:(AssetModel *)data {
     _data = data;
-    [PFImagePickerTool requestImageWithAsset:data.asset completionHandler:^(UIImage *image, NSString *filePath, BOOL succees) {
+    [PFImagePickerTool requestImageWithAsset:data.asset completionHandler:^(UIImage *image, NSString *filePath, BOOL succees, NSString *UTI) {
         _poster.image = image;
         _originalImage  = image;
-
     }];
     
 }

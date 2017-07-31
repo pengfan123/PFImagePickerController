@@ -21,7 +21,6 @@ typedef enum : NSUInteger {
 @end
 @implementation UICustomRecognizer
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    //NSLog(@"---------%s-----", __func__);
     [super touchesBegan:touches withEvent:event];
     _finalRect = self.view.bounds;
     [self validateWithTouches:touches.allObjects];
@@ -101,12 +100,10 @@ typedef enum : NSUInteger {
     self.state = UIGestureRecognizerStateBegan;
  }
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    NSLog(@"---------%s-----", __func__);
     [super touchesCancelled:touches withEvent:event];
     self.state = UIGestureRecognizerStateCancelled;
 }
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    NSLog(@"---------%s-----", __func__);
     [super touchesEnded:touches withEvent:event];
     self.state = UIGestureRecognizerStateEnded;
     self.state = UIGestureRecognizerStateRecognized;

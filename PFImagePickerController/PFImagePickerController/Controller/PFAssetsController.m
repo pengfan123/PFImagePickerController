@@ -49,12 +49,13 @@ static NSString * const identifier = @"AssetCell";
     self.title = self.collection.localizedTitle;
     
     //add collectionView
-    CGFloat width = [UIScreen mainScreen].bounds.size.width / 3.0;
+    CGFloat space = 5;
+    CGFloat width = ([UIScreen mainScreen].bounds.size.width - 5 * space) / 4.0;
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    flowLayout.minimumInteritemSpacing = 0;
-    flowLayout.minimumLineSpacing = 0;
+    flowLayout.minimumInteritemSpacing = space;
+    flowLayout.minimumLineSpacing = space;
     flowLayout.scrollDirection = UICollectionViewScrollDirectionVertical;
-    flowLayout.sectionInset = UIEdgeInsetsZero;
+    flowLayout.sectionInset = UIEdgeInsetsMake(space, space, space, space);
     flowLayout.itemSize = CGSizeMake(width, width);
     flowLayout.headerReferenceSize = CGSizeZero;
     

@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <Photos/Photos.h>
-
+#define MAINCOLOR  [UIColor colorWithRed:39.0 / 255.0 green:173.0 / 255.0 blue:253.0 / 255.0 alpha:1.0]
 @class PHAsset, PHAssetCollection, AssetModel;
 
 typedef void(^enumrationBlock)(NSError *error,NSArray *dataArr);

@@ -26,13 +26,17 @@
     albumsController.imagePickerController = self;
     UINavigationController *navi = [[UINavigationController alloc] initWithRootViewController:albumsController];
     [self addChildViewController:navi];
+    [[UINavigationBar appearance] setBarTintColor:[UIColor blackColor]];
+    [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor whiteColor]}];
+    [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
     navi.view.frame = self.view.bounds;
     [self.view addSubview:navi.view];
     [navi didMoveToParentViewController:self];
 }
-- (BOOL)prefersStatusBarHidden {
-    return YES;
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return  UIStatusBarStyleLightContent;
 }
+
 #pragma mark - extern method
 //介绍选择
 -(void)pfImagePickerControllerDidFinishPickImage{
