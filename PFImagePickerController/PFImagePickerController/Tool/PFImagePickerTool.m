@@ -268,7 +268,7 @@ void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *i
 + (void)requestImageWithAsset:(PHAsset *)asset targetSize:(CGSize)size completionHandler:(void (^)(UIImage *, NSString *, BOOL))handler {
     [shareTool requestImageWithAsset:asset targetSize:size completionHandler:handler];
 }
-//快速获取原图(同步)
+//快速获取图片(同步,不是原图)
 + (void)requestFastImageWithAsset:(PHAsset *)asset Handler:(void (^)(UIImage *, NSString *, BOOL))handler{
     PHImageRequestOptions *options = [PHImageRequestOptions new];
     options.synchronous = YES;
@@ -283,7 +283,7 @@ void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *i
     }];
 }
 //获取原图
-+(void)requestImageWithAsset:(PHAsset *)asset completionHandler:(void (^)(UIImage *, NSString *, BOOL))handler{
++(void)requestImageWithAsset:(PHAsset *)asset completionHandler:(void (^)(UIImage *, NSString *, BOOL, NSString *))handler{
     [shareTool requestImageWithAsset:asset completionHandler:handler];
 }
 //获取集合的封面图片
@@ -296,11 +296,21 @@ void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *i
     for (NSUInteger index = 0; index < models.count; index ++) {
         if (!stop) {
             AssetModel *model = models[index];
-            [self requestFastImageWithAsset:model.asset Handler:^(UIImage *image, NSString *UTI, BOOL succees) {
-                if (succees) {
-                    completion(&stop, index, image,UTI);
-                }
-            }];
+            if (!model.original) {//如果不是原图就请求低质量的图片
+                [self requestFastImageWithAsset:model.asset Handler:^(UIImage *image, NSString *UTI, BOOL succees) {
+                    if (succees) {
+                        completion(&stop, index, image,UTI);
+                    }
+                }];
+            }
+            else {//请求原图
+                [self requestImageWithAsset:model.asset completionHandler:^(UIImage *image, NSString *filePath, BOOL succees, NSString *UTI) {
+                    if (succees) {
+                        completion(&stop,index,image,UTI);
+                    }
+                }];
+            }
+            
         }
         else{
             break;
@@ -524,14 +534,20 @@ void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *i
     NSDictionary *dic = [cacheDic objectForKey:identifier];
     return [self filterFilePrefixWithFileURL:dic[@"PHImageFileURLKey"]];
 }
-- (void)requestImageWithAsset:(PHAsset *)asset completionHandler:(void (^)(UIImage *, NSString *, BOOL))completion {
+- (NSString *)getUTIWithIdentifier:(NSString *)identifier {
+    NSDictionary *dic = [cacheDic objectForKey:identifier];
+    return  dic[@"PHImageFileUTIKey"];
+}
+- (void)requestImageWithAsset:(PHAsset *)asset completionHandler:(void (^)(UIImage *, NSString *, BOOL, NSString *))completion {
     if (asset == nil) {
         [PFImagePickerTool excuteOnMainThreadWithOperation:^{
-            completion(nil, nil, NO);
+            completion(nil, nil, NO,nil);
         }];
     }
     else {
+        //根据路径来取出图片,之前已经请求过这个图片,保存了这个图片的路径
         NSString *path = [self getPosterPathWithIdentifier:asset.localIdentifier];
+        NSString *UTI = [self getUTIWithIdentifier:asset.localIdentifier];
         NSString *prefix = @"file://";
         if ([path hasPrefix:prefix]) {
             path = [path substringFromIndex:prefix.length];
@@ -539,7 +555,7 @@ void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *i
         UIImage *image = [[UIImage alloc] initWithContentsOfFile:path];
         if (image) {
             [PFImagePickerTool excuteOnMainThreadWithOperation:^{
-                 completion(image, path, YES);
+                 completion(image, path, YES,UTI);
             }];
             return;
 
@@ -552,13 +568,12 @@ void callBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *i
                 
                 [[PHCachingImageManager defaultManager] requestImageDataForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
                     UIImage *image = [UIImage imageWithData:imageData];
-
                     NSString *imagePath = [self filterFilePrefixWithFileURL:info[@"PHImageFileURLKey"]];
                     [PFImagePickerTool excuteOnMainThreadWithOperation:^{
                         if (info) {
                             [cacheDic setObject:info forKey:asset.localIdentifier];
                         }
-                        completion(image,imagePath, YES);
+                        completion(image,imagePath, YES, dataUTI);
                     }];
                 }];
 

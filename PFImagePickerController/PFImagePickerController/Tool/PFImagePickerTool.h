@@ -157,7 +157,7 @@ extern  NSString *  const PhotosDidEndSelectNotification;
  *  @param handler 结束操作
  *
  */
-+ (void)requestImageWithAsset:(PHAsset *)asset completionHandler:(void(^)(UIImage *image, NSString *filePath, BOOL succees))handler;
++ (void)requestImageWithAsset:(PHAsset *)asset completionHandler:(void(^)(UIImage *image, NSString *filePath, BOOL succees, NSString *UTI))handler;
 /**
  *  获取集合的封面图片
  *
