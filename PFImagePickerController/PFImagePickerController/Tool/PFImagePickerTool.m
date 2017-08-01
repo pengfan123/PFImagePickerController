@@ -20,6 +20,7 @@ NSString * const PhotosChangeNotification = @"PFImagePickerToolUpdate";
 @property(nonatomic,strong)NSArray *collections;
 @end
 static int MAX = 20;
+static NSMutableArray *identifiers;      //用于标记缓存模型的顺序
 static NSMutableDictionary *selectedDic; //用于存放选定的模型
 static NSMutableDictionary *imageDic;    //缓存加载的图片
 static NSMutableDictionary *cacheDic;    //用于缓存模型
@@ -58,6 +59,7 @@ static NSMutableArray *tasks;
     cacheDic     = [NSMutableDictionary new];
     imageDic     = [NSMutableDictionary new];
     tasks        = [NSMutableArray new];
+    identifiers  = [NSMutableArray new];
     library      = [PHPhotoLibrary sharedPhotoLibrary];
     shareTool    = [[self alloc] init];
     bundleName = [[NSBundle mainBundle] objectForInfoDictionaryKey:(__bridge NSString*)kCFBundleNameKey];
@@ -100,6 +102,14 @@ static NSMutableArray *tasks;
 //获取已选模型
 + (NSArray *)getSelectedAssetsArr {
     return [selectedDic allValues];
+}
++ (NSUInteger)indexForModel:(AssetModel *)model {
+    for (NSUInteger index = 0; index < identifiers.count; index++) {
+        if ([identifiers[index] isEqualToString:model.asset.localIdentifier]) {
+            return  index + 1;
+        }
+    }
+    return 0;
 }
 //清除缓存数据
 + (void)restoreAction {
@@ -149,17 +159,21 @@ static NSMutableArray *tasks;
     if (!model) {
         return NO;
     }
+    NSString *key = model.asset.localIdentifier;
     if (model.isSelected) {
-        NSString *key = model.asset.localIdentifier;
         [selectedDic setObject:model forKey:key];
         if (![self canSelect]) {
             [selectedDic removeObjectForKey:key];
             model.isSelected = NO;
             return NO;
         }
+        else {
+            [identifiers addObject:key];
+        }
         return YES;
     }else{
-        [selectedDic removeObjectForKey:model.asset.localIdentifier];
+        [selectedDic removeObjectForKey:key];
+        [identifiers removeObject:key];
         return NO;
     }
     

@@ -117,7 +117,7 @@
     }
     _selectBtn.selected = model.isSelected;
     if (_selectBtn.selected) {
-         [_selectBtn setTitle:[NSString stringWithFormat:@"%ld",[PFImagePickerTool selectedCount]] forState:UIControlStateSelected];
+         [_selectBtn setTitle:[NSString stringWithFormat:@"%lu",[PFImagePickerTool indexForModel:model]] forState:UIControlStateSelected];
     }
 }
 - (void)viewWillDisappear:(BOOL)animated {

@@ -125,7 +125,12 @@ static NSString * const identifier = @"AssetCell";
     dataModel.isSelected = !dataModel.isSelected;
     dataModel.isSelected = [PFImagePickerTool storeSelectedOrUnselectedModel:dataModel];
     [self updateButtonStatus];
+    [self updateIndexInfo];
     return dataModel.isSelected;
+}
+- (void)updateIndexInfo {
+    NSArray *cells = self.assetsView.visibleCells;
+    [cells makeObjectsPerformSelector:@selector(updateIndex)];
 }
 //点击item,预留的,跳入编辑界面
 -(void)AssetCell:(AssetCell *)cell didClickWithDataModel:(AssetModel *)dataModel andOriginalImagePath:(NSString *)imagePath andIndex:(NSInteger)index{

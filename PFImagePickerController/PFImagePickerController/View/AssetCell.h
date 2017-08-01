@@ -31,4 +31,5 @@
 @end
 @interface AssetCell : UICollectionViewCell
 -(instancetype)initWithCollectionView:(UICollectionView *)collectionView andDataModel:(AssetModel *)dataModel andIndexPath:(NSIndexPath *)indexPath andDelegate:(id<AssetCellDelegate>)delegate;
+- (void)updateIndex;
 @end

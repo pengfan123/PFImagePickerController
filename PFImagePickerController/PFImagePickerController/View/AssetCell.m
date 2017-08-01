@@ -12,8 +12,10 @@
 #import "AssetModel.h"
 #import <Photos/Photos.h>
 @interface AssetCell()
+
 @property(nonatomic,copy)NSString *filePath;
-@property(nonatomic,strong)AssetModel *dataModel;                //数据模型
+@property(nonatomic,strong)AssetModel *dataModel;
+//数据模型
 @property (weak, nonatomic) IBOutlet UIImageView *assetView;       //展示图片的视图
 @property (weak, nonatomic) IBOutlet UIButton *selectBtn;          //选择按钮
 @property (weak, nonatomic)id<AssetCellDelegate>delegate;          //代理对象
@@ -24,13 +26,8 @@
 - (IBAction)selectAct:(UIButton *)sender;
 
 @end
+
 @implementation AssetCell
--(void)awakeFromNib{
-    [super awakeFromNib];
-    [self.selectBtn setImage:[UIImage imageNamed:@"unselected"] forState:UIControlStateNormal];
-    [self.selectBtn setImage:[UIImage imageNamed:@"selected"] forState:UIControlStateSelected];
-    [self.styleView setImage:[UIImage imageNamed:@"media"]];
-}
 -(instancetype)initWithCollectionView:(UICollectionView *)collectionView andDataModel:(AssetModel *)dataModel andIndexPath:(NSIndexPath *)indexPath andDelegate:(id<AssetCellDelegate>)delegate{
     self = [collectionView dequeueReusableCellWithReuseIdentifier:@"AssetCell" forIndexPath:indexPath];
     _assetView.userInteractionEnabled = YES;
@@ -48,6 +45,11 @@
     return self;
 
 }
+- (void)updateIndex {
+    if (_dataModel.isSelected) {
+         [_selectBtn setTitle:[NSString stringWithFormat:@"%lu",[PFImagePickerTool indexForModel:_dataModel]] forState:UIControlStateSelected];
+    }
+}
 -(void)setDataModel:(AssetModel *)dataModel{
     _assetView.image = nil;
     _dataModel = dataModel;
@@ -58,6 +60,7 @@
         _styleView.hidden = NO;
     }
     _selectBtn.selected = dataModel.isSelected;
+    [self updateIndex];
     [PFImagePickerTool addOperation:^{
         [PFImagePickerTool requestImageWithAsset:dataModel.asset targetSize:CGSizeMake(100, 100) completionHandler:^(UIImage *image, NSString *filePath, BOOL succees) {
             if (image) {

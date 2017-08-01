@@ -29,11 +29,15 @@
                         <constraints>
                             <constraint firstAttribute="width" secondItem="zm8-tq-q7L" secondAttribute="height" multiplier="1:1" id="4rY-eN-zSi"/>
                         </constraints>
+                        <state key="normal" backgroundImage="unselected.png"/>
+                        <state key="selected" backgroundImage="circle_selected.png">
+                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
                         <connections>
                             <action selector="selectAct:" destination="gTV-IL-0wX" eventType="touchUpInside" id="pdA-Ge-9nT"/>
                         </connections>
                     </button>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UEX-7G-tTa">
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="media.png" translatesAutoresizingMaskIntoConstraints="NO" id="UEX-7G-tTa">
                         <rect key="frame" x="50" y="50" width="25" height="25"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="UEX-7G-tTa" secondAttribute="height" multiplier="1:1" id="s7p-BR-LMN"/>
@@ -60,4 +64,9 @@
             </connections>
         </collectionViewCell>
     </objects>
+    <resources>
+        <image name="circle_selected.png" width="128" height="128"/>
+        <image name="media.png" width="135" height="135"/>
+        <image name="unselected.png" width="128" height="128"/>
+    </resources>
 </document>

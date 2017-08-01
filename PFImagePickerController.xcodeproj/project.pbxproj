@@ -39,7 +39,6 @@
 		B26FBD151F0F64ED001FF05E /* blur.png in Resources */ = {isa = PBXBuildFile; fileRef = B26FBD041F0F64ED001FF05E /* blur.png */; };
 		B26FBD161F0F64ED001FF05E /* cancel.png in Resources */ = {isa = PBXBuildFile; fileRef = B26FBD051F0F64ED001FF05E /* cancel.png */; };
 		B26FBD171F0F64ED001FF05E /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = B26FBD061F0F64ED001FF05E /* circle.png */; };
-		B26FBD181F0F64ED001FF05E /* circle_selected.png in Resources */ = {isa = PBXBuildFile; fileRef = B26FBD071F0F64ED001FF05E /* circle_selected.png */; };
 		B26FBD191F0F64ED001FF05E /* edit.png in Resources */ = {isa = PBXBuildFile; fileRef = B26FBD081F0F64ED001FF05E /* edit.png */; };
 		B26FBD1A1F0F64ED001FF05E /* edit_selected.png in Resources */ = {isa = PBXBuildFile; fileRef = B26FBD091F0F64ED001FF05E /* edit_selected.png */; };
 		B26FBD1B1F0F64ED001FF05E /* filter.png in Resources */ = {isa = PBXBuildFile; fileRef = B26FBD0A1F0F64ED001FF05E /* filter.png */; };
@@ -62,6 +61,7 @@
 		B28846991F0E326800684DC7 /* PFShowImageController.m in Sources */ = {isa = PBXBuildFile; fileRef = B28846971F0E326800684DC7 /* PFShowImageController.m */; };
 		B288469A1F0E326800684DC7 /* PFShowImageController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B28846981F0E326800684DC7 /* PFShowImageController.xib */; };
 		B28C5B131EE0005E006D8A1D /* AssetModel.m in Sources */ = {isa = PBXBuildFile; fileRef = B28C5B121EE0005E006D8A1D /* AssetModel.m */; };
+		B29EB9461F301FE1006C7436 /* circle_selected.png in Resources */ = {isa = PBXBuildFile; fileRef = B29EB9451F301FE1006C7436 /* circle_selected.png */; };
 		B2AAE2E01F218FFF00B4F5B5 /* PFPaintView.m in Sources */ = {isa = PBXBuildFile; fileRef = B2AAE2DF1F218FFF00B4F5B5 /* PFPaintView.m */; };
 		B2AAE31C1F21F17700B4F5B5 /* PFFilterTool.m in Sources */ = {isa = PBXBuildFile; fileRef = B2AAE31B1F21F17700B4F5B5 /* PFFilterTool.m */; };
 		B2AAE3481F21F72300B4F5B5 /* PFFilterOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = B2AAE3471F21F72300B4F5B5 /* PFFilterOperation.m */; };
@@ -139,7 +139,6 @@
 		B26FBD041F0F64ED001FF05E /* blur.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blur.png; sourceTree = "<group>"; };
 		B26FBD051F0F64ED001FF05E /* cancel.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cancel.png; sourceTree = "<group>"; };
 		B26FBD061F0F64ED001FF05E /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle.png; sourceTree = "<group>"; };
-		B26FBD071F0F64ED001FF05E /* circle_selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle_selected.png; sourceTree = "<group>"; };
 		B26FBD081F0F64ED001FF05E /* edit.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edit.png; sourceTree = "<group>"; };
 		B26FBD091F0F64ED001FF05E /* edit_selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edit_selected.png; sourceTree = "<group>"; };
 		B26FBD0A1F0F64ED001FF05E /* filter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = filter.png; sourceTree = "<group>"; };
@@ -169,6 +168,7 @@
 		B28846981F0E326800684DC7 /* PFShowImageController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PFShowImageController.xib; sourceTree = "<group>"; };
 		B28C5B111EE0005E006D8A1D /* AssetModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AssetModel.h; sourceTree = "<group>"; };
 		B28C5B121EE0005E006D8A1D /* AssetModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AssetModel.m; sourceTree = "<group>"; };
+		B29EB9451F301FE1006C7436 /* circle_selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle_selected.png; sourceTree = "<group>"; };
 		B2AAE2DE1F218FFF00B4F5B5 /* PFPaintView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFPaintView.h; sourceTree = "<group>"; };
 		B2AAE2DF1F218FFF00B4F5B5 /* PFPaintView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFPaintView.m; sourceTree = "<group>"; };
 		B2AAE31A1F21F17700B4F5B5 /* PFFilterTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFFilterTool.h; sourceTree = "<group>"; };
@@ -369,12 +369,12 @@
 		B26FBD011F0F64ED001FF05E /* Resource */ = {
 			isa = PBXGroup;
 			children = (
+				B29EB9451F301FE1006C7436 /* circle_selected.png */,
 				B26FBD021F0F64ED001FF05E /* back.png */,
 				B26FBD031F0F64ED001FF05E /* big_placeholder.png */,
 				B26FBD041F0F64ED001FF05E /* blur.png */,
 				B26FBD051F0F64ED001FF05E /* cancel.png */,
 				B26FBD061F0F64ED001FF05E /* circle.png */,
-				B26FBD071F0F64ED001FF05E /* circle_selected.png */,
 				B26FBD081F0F64ED001FF05E /* edit.png */,
 				B26FBD091F0F64ED001FF05E /* edit_selected.png */,
 				B26FBD0A1F0F64ED001FF05E /* filter.png */,
@@ -496,6 +496,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B29EB9461F301FE1006C7436 /* circle_selected.png in Resources */,
 				B26FBD151F0F64ED001FF05E /* blur.png in Resources */,
 				B26FBD191F0F64ED001FF05E /* edit.png in Resources */,
 				B26FBD201F0F64ED001FF05E /* save.png in Resources */,
@@ -515,7 +516,6 @@
 				B26FBD1F1F0F64ED001FF05E /* rotate.png in Resources */,
 				B288469A1F0E326800684DC7 /* PFShowImageController.xib in Resources */,
 				B250D7DE1CE9541400F4EC06 /* Assets.xcassets in Resources */,
-				B26FBD181F0F64ED001FF05E /* circle_selected.png in Resources */,
 				B28130391F1D9E0A003CFBE1 /* PFClipAndRotateController.xib in Resources */,
 				B27FA5071F1352EA000D3DCB /* PFRotateAndClipView.xib in Resources */,
 				B226E8C31CEF04F700C82B39 /* PFMovieController.xib in Resources */,

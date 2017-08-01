@@ -50,7 +50,13 @@ extern  NSString *  const PhotosDidEndSelectNotification;
  *
  *  @return 返回assets对象的数组
  */
-+(NSArray *)getSelectedAssetsArr;
++ (NSArray *)getSelectedAssetsArr;
+/**
+ *  返回选定模型的序列号
+ *
+ *  @return 序列号
+ */
++ (NSUInteger)indexForModel:(AssetModel *)model;
 /**
  *  清除缓存数据
  */
